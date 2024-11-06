@@ -33,7 +33,8 @@
 \usepackage{float}
 \usepackage{cleveref}
 \pgfplotsset{compat=1.16}
-
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
 \newcommand{\incfig}[2][1]{%
     \def\svgwidth{#1\columnwidth}
     \import{./figures/}{#2.pdf_tex}
@@ -123,6 +124,9 @@
 \DeclareMathOperator{\FP}{FP}
 \DeclareMathOperator{\poly}{poly}
 \DeclareMathOperator{\const}{const}
+\DeclareMathOperator{\Imm}{Im}
+
+\usepackage[color=red!20, textwidth=25mm, colorinlistoftodos]{todonotes}
 
 \begin{document}
     \title{Cryptography. \\ Lecture Notes, fall 2024/2025}
@@ -141,9 +145,12 @@
         \item Homework exercises: $\approx 20\%$.
         \item Bonuses $\approx 10\%$ for lecture notes.
     \end{itemize}
-    Exam and the midterm is open-book.
+    Exam and the midterm are open-book.
 
     \import{sections/}{02.tex}
+    \import{sections/}{03.tex}
+    \import{sections/}{04.tex}
+    \import{sections/}{05.tex}
 
 \end{document}
 

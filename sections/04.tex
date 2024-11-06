@@ -1,0 +1,154 @@
+%24.10.2024, lecture 4
+
+\subsection{Goldreich-Levin Theorem}
+
+\begin{proof}[Proof of \Cref{thm:goldreich_levin}]
+  Assume we have an adversary that computes $B(x, r) = \langle x, r\rangle = \bigoplus_i x_i r_i$ from  $f(x), r$. 
+  Call that adversary $\tilde B(f(x), r)$.
+  We will try to invert  $f$.
+  Some notation (consider strings as bit vectors), let $e_i \coloneqq (0, 0, \ldots, 0, \underbrace{1}_i, 0, \ldots, 0)$.
+
+  Then, 
+  \[
+    x_i = \langle x, r\rangle \oplus \langle x, r \oplus e_i \rangle = B(x, r) \oplus B(x, r \oplus e_i).
+  \] 
+  But we cannot just use $\tilde B(f(x), r) \oplus \tilde B(f(x), r \oplus e_i)$, since those decoding are not independent, since we can have a small probability of success.
+
+  Let $\beta_r = \tilde B(f(x), r)$ and let  $\beta_{r \oplus e_i} = \tilde B(f(x), r \oplus e_i)$.
+  We can try to guess $\beta_{r \oplus e_i}$ and use $\beta_r$.
+  But we cannot check the correctness of it (without knowing all the $x$).
+  We will guess $\beta_s$ for logarithmically many  $s$ and check then. 
+  And the probability will be good, since $2^{O(\log n)} = n^{O(1)}$.
+
+  Sample $l = O (\log n)$ vectors  $r^j$ at uniform from  $U_n$.
+  Try all possible bits  $\beta^j$ for  $B(x, r^j)$ (and assume we guessed the correct ones).
+  Now, for every non-empty set  $J \subseteq \{1, \ldots, l\}$ compute
+  \[
+    r^J = \oplus_{j \in J} r^j \qquad \beta^J = \oplus_{j \in J} \beta^j.
+  \] 
+
+  Then, those $\beta^J$ are correct, as  $\langle x, s \rangle \oplus \langle x, t \rangle = \oplus_i x_i (s_i \oplus t_i) = \langle x, s \oplus t \rangle.$
+  Hence, we compute 
+   \[
+    x_{i}^J = \beta^J \oplus \tilde B(f(x), r^J \oplus e_i).
+  \] 
+  And let $\tilde x_i = \text{maj} x_i^J$.
+  Let's prove that we've found correct input with high probability.
+  Assume that $\tilde B$ succeeds with probability  $\frac{1}{2} + \delta$ and $\delta = \frac{1}{n^{k}}$.
+
+   \begin{lemma}
+    Many inputs of $\tilde B$ are correct whp:
+	 \[
+		 \left|\left\{x \in \{0,1\}^n \mid \Pr[\tilde B(f(x), r) = B(x, r)] \geq \frac{1}{2} + \frac{\delta}{2}\right\}\right| \geq \delta \cdot 2^n.
+	\] 
+  \end{lemma}
+  \begin{proof}
+	  Let 
+	  \[
+		  S_n = \left\{x \in \{0,1\}^n \mid \Pr\left[\underbrace{\tilde B(f(x), r) = B(x, r)}_{S(x)}\right] \geq \frac{1}{2} + \frac{\delta}{2}\right\}.
+	  \] 
+	  Now we will proof by counting argument:
+    \[
+		|U_n \setminus S_n| = 2 ^{n} \cdot \Pr_x \left[S(x) < \frac{1}{2} + \frac{\delta}{2}\right] = 2^{n} \cdot \Pr_x \left[1 - S(x) \geq \underbrace{\frac{1}{2} - \frac{\delta}{2}}_{\alpha^*}\right],
+    \] 
+	so this means that
+	\[
+		\E_x[1 - S(x)] \geq 1 - \left(\frac{1}{2} + \delta\right) = \frac{1}{2} - \delta.
+	\] 
+	Using Markov's inequality we have that:
+	\[
+		\Pr_x \left[1 - S(x) \geq \frac{1}{2} - \frac{\delta}{2}\right] \leq \frac{\frac{1}{2} - \delta}{\frac{1}{2} - \frac{delta}{2}} \leq 1 - \delta.
+	\] 
+  \end{proof}
+
+  \begin{lemma}
+    $r^J \in U_n$ and  $r^J, r^K$ are independent for  $J \neq K$.
+  \end{lemma}
+  \begin{proof}
+    If $K \subseteq J$, then
+	 \begin{align*}
+		 \Pr[r^j = t, r^k = t'] &= \Pr[r^{J \setminus K} = t \oplus t', r^{K} = t'] = \\
+								&= \Pr[r^{J \setminus K} = t \oplus t'] \cdot \Pr[r^K = t'] = \Pr[r^J = t] \cdot \Pr[r^k = t'],
+	 \end{align*} where last equality follows from the fact that $r^j$ are distributed uniformly. 
+
+	 Otherwise, $J \setminus K \neq \varnothing$ and  $K \setminus J \neq \varnothing$, hence
+	 \begin{align*}
+		 \Pr[r^J = t, r^K = t'] &= \sum_{t''} \Pr[r^J = t, r^K = t', r^{J \cap K} = t''] \\
+								&= \sum_{t''} \Pr[r^{J \setminus K} = t \oplus t'', r^{K \setminus J} = t' \oplus t'', r^{J \cap K} = t''] \\
+								&= \sum_{t''} \Pr[r^{J \setminus K} = t \oplus t''] \cdot \Pr[r^{K \setminus J} = t' \oplus t''] \cdot \Pr[r^{J \cap K} = t''] \\
+								&= \Pr[r^{J} = t] \cdot \Pr[r^{K} = t'].
+	 \end{align*}
+  \end{proof}
+
+  Let $\xi_i^j \coloneqq [x_i = x_i^J]$ be an event that we decoded correctly.
+   \begin{lemma}
+	   For $x \in S_n, i \in [n]$ and big enough $n$ we have:
+    \[
+		\Pr\left[\sum_J \xi_i^J \leq \frac{2^{l} - 1}{2}\right] \leq \frac{1}{2n}.
+    \] 
+  \end{lemma}
+  \begin{proof}
+	  We put $l = (2k + 2) \log_2 n$ and let  $m = 2^{l} - 1$.
+	  It is easy to see that
+	  \[
+		  \E\left[\sum_J \xi_i^J\right] \geq m(\frac{1}{2} + \frac{\delta}{2}).
+	  \]
+	  Since we have pairwise independence we have that $\Var(\sum_J \xi_i^J) = m \cdot \Var(\xi_i^J) \leq m$ (since the variance is no more than 1).
+	  Then using Chebyshev's inequality we have that:
+	   \[
+		   \Pr\left[\sum_J \xi_i^J < m\left(\frac{1}{2} + \frac{\delta}{2}\right)\right] \leq \frac{4 m \Var(\xi_i^J)}{m^2 \delta^2} \leq \frac{4}{m \delta^2} \leq \frac{4}{n^2} \leq \frac{1}{2n}.
+	  \] 
+  \end{proof}
+
+  Having those Lemmas, we try all possible $\beta^j$ for the basic vectors  $r^j$.
+  Then, for correct $\beta$'s most answers  $x_i^J$ are correct whp.
+  Therefore we computed correct  $x_i$ by using majority with probability  $\geq \frac{1}{2}$ and wsp in total.
+  Given all $x_i$'s check that we decoded $f(x)$ correctly.
+\end{proof}
+
+All of them are about the proof above.
+\begin{exercise}
+  Do we really need length preserving owf?
+\end{exercise}
+
+\begin{exercise}
+  We need to know the success probability of $\tilde B$.
+  Get rid of it.
+\end{exercise}
+
+\begin{exercise}
+  What if $f$ is not injective?
+\end{exercise}
+
+\section{Pseudorandom Generators}
+
+\begin{definition}
+  We say that $G \colon \{0,1\}^l \to \{0,1\}^{f(l)}$ is an $f(l)$-PRG if for every adversary  $A$, the distributions  $G(U_l)$ and  $U_{f(l)}$ are computationally indistinguishable.
+\end{definition}
+
+If one creates such a generator for $f(l) = 2^{l}$, then it means that all poly-time randomized algorithm are in $\PP$! 
+
+We introduce a public scheme encryption scheme:
+\[
+E^{**}(b_1, \ldots, b_m, e, r) = (e^{m}(r), B(r) \oplus b_1, B(e(r)) \oplus b_2, \ldots, B(e^{m - 1}(r)) \oplus b_m).
+\] 
+
+\begin{theorem}
+  If one breaks $E^{**}$, then we can break a PRG.
+\end{theorem}
+
+Here, $e$ is a public function and  $d$ is a private invert functrion of  $e$.
+And $B$ is a hardcore predicate.
+Alice can easily decrypt the message using $d^{m}(e^{m}(r)) = r$, then she can compute other bits.
+
+\begin{lemma}
+	If $g$ is a length-preserving owp and  $B$ is its hardcore predicate, then there is an  $f(l)$-PRG:
+	 \[
+	  G_l(x) = g^{f(l) - l}(x) \circ B(x) \circ B(g(x)) \circ \dots \circ B(g^{f(l) - l - 1}(x)).
+	\] 
+\end{lemma}
+\begin{proof}
+  Idea: if we distinguish $U$ from  $G_{f(l)}(U)$, then we distinguish  $G_i(U)$ and  $G_{i + 1}(U)$ for some $i$.
+
+  \todo[inline]{finish}
+\end{proof}

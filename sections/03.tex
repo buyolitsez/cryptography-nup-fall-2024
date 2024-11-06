@@ -1,0 +1,81 @@
+%17.10.2024, lecture 3
+
+\section{Public-Key Encryption Schemes}
+
+Alice holds public and secret keys.
+She wants to send a message to Bob, but the communication channel is being listened by adversary Eve.
+We want Eve to not be able to decrypt the message, even though she has seen a lot of communication (and perhaps some messages).
+
+\begin{definition}
+	A family of poly-time computable function $B_n \colon \{0, 1\}^n \to \{0, 1\}$ is a \emph{hardcore predicate} for  $f_n \colon \{0, 1\}^n \to \{0, 1\}^s$ if no adversary can guess $B_n(x)$ from  $f_n(x)$ with probability non-negligibly better than  $\frac{1}{2}$.
+	\[
+		\forall k \; \forall A \; \exists N \; \forall n > N \; \Pr[A(f_n(x)) = B_n(x)] < \frac{1}{2} + \frac{1}{n^{k}},
+	\] where $A$ is a randomized polynomial-time adversary.
+	The probability is taken over  $x \in U_n$ and over the randomness used by  $A$.
+	See \Cref{fig:hardcore_predicate}.
+\begin{figure}[H]
+	\centering
+\begin{tikzpicture}[>=Stealth, node distance=3cm, thick]
+    \node (x) at (0,0) {$x$};
+    \node (fx) at (3,0) {$f(x)$};
+    \node (bx) at (0,-2) {$B(x)$};
+    \draw[->, green] (x) -- (fx);
+    \draw[->, green] (x) -- (bx);
+    \draw[<-, dashed, red] (bx) -- (fx);
+\end{tikzpicture}
+	\caption{From $x$ we can obtain both  $f(x)$ and $B(x)$, but from  $f(x)$ we cannot calculate  $B(x)$.}
+	\label{fig:hardcore_predicate}
+\end{figure}
+\end{definition}
+
+\begin{theorem}[Oded Goldreich, Leonid Levin] \label{thm:goldreich_levin}
+  If $f$ is a strongly one-way function, then  $\tilde f(x, r) = (f(x), r)$ is a strongly one-way function and  $B(x, r) = x_1 r_1 \oplus x_2r_2 \oplus \dots$ is its hardcore predicate (here $r$ is some additional bits, where $|r| = |x|$).
+\end{theorem}
+\begin{proof}
+  delayed.
+\end{proof}
+\begin{exercise}
+  The construction works for trapdoor permutations families as well.
+  Formulate and prove it.
+\end{exercise}
+
+
+\newcommand{\sk}{\textcolor{red}{\text{sk}}}
+\newcommand{\pk}{\textcolor{green}{\text{pk}}}
+\newcommand{\ct}{\textcolor{blue}{\text{code}}}
+\newcommand{\m}{\textcolor{blue}{\text{msg}}}
+\begin{algorithm}
+
+\begin{itemize}
+    \item $G$ (Alice) generates a pair of keys (public key \pk, secret/private key \sk):
+    \[
+    G: (1^n, r_g) \mapsto (\pk, \sk),
+    \]
+    where $r_g \in \{0,1\}^*$ is a random string privately used by $G$.
+    \item $E$ (Bob) encrypts a one-bit message $\m$ using the public key: $\ct \coloneqq E$(\pk, \m).
+    \item $D$ (Alice) decrypts a one-bit message $\m$ using the secret key: $D(\sk, \ct) \approx \m$.
+    We assume that the message is decrypted correctly:
+    \[
+    D(\sk, E(\pk, \m)) = \m,
+    \] or at least
+    \[
+		\Pr[ D(\sk, E(\pk, \m)) = \m ] \geq 0.9.
+    \]
+	\item An adversary $A(\pk, \ct)$ (Eve) should not be able to decrypt (without $\sk$) with non-negligible probability, at least
+    \[
+    \Pr\{ A(\pk, E(\pk, \m)) = \m \} < \eps(n).
+    \]
+\end{itemize}
+\end{algorithm}
+
+Assume that $G$ generates a trapdoor permutation family:
+determenistic polynomial-time  $G \colon (1^{n}, r_g) \mapsto (e, d, s)$ (Boolean circuits) s.t.
+\begin{itemize}
+	\item $e \colon \{0,1\}^n \to \{0,1\}^{\xi(n)}$ 
+	\item $d \colon \{0,1\}^{\xi(n)} \to \{0,1\}^n$ 
+	\item $s \colon \{0,1\}^{\sigma(n)} \to \{0,1\}^n$
+\end{itemize}
+such that for all $x \in \Im(s)$ we have  $d(e(x)) = x$.
+Then, if  $B(x)$ is a hardcore predicate, then  $B(x)$ is hard to guess from  $e(x)$.
+
+\todo[inline]{complete}

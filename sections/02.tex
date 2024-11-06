@@ -1,259 +1,316 @@
 %09.10.2024, lecture 2
 
-\section{One-way functions}\label{sec:one_way_functions}
+\section{One-way~Functions}\label{sec:one_way_functions}
 
-
-$\fP$ means functions that can be computed in polynomial time.
-$\FP$ means to find a solution in polynomial time.
+Let $\fP$ denote the class of functions that can be computed in~polynomial~time.
+Similarly, let $\FP$ denote the class of problems for which a~solution can be found in~polynomial~time.
 
 \begin{definition}
-    A one-way function is an injection function that can be easily computed (in polynomial time), but it cannot be inverted easily (in polynomial).
+	A \emph{one-way function} is an injective function that can be efficiently computed (in~polynomial~time), but whose inverse cannot be efficiently computed (in~polynomial~time).
 \end{definition}
 
 \begin{theorem}
-    Let $\PP \neq \NP$, then there is $f \in \fP$ such that $f^{-1} \not \in \FP$.
+    If $\PP \neq \NP$, then there exists an $f \in \fP$ such that $f^{-1} \not\in \fP$.
 \end{theorem}
+
 \begin{proof}
-    Let $\Phi$. be a Boolean formula.
-    Let $A \in \{0, 1\}^n$ be a Boolean assignment to its $n$ variables.
+    Let $\Phi$ be a Boolean formula, and let $A \in \{0, 1\}^n$ be a Boolean assignment to its $n$ variables.
     Define
     \begin{align*}
         f(\Phi, A) = \begin{cases}
-        (\Phi, 1^n), &\text{ if } \Phi[A]=1 \\
-        (\Phi, 0^n), &\text{ if } \Phi[A]=0
+        (\Phi, 1^n), &\text{ if } \Phi[A]=1, \\
+        (\Phi, 0^n), &\text{ if } \Phi[A]=0.
         \end{cases}
     \end{align*}
-    If we could invert $f$, we could solve SAT by computing $f^{-1}(\Phi, 1^n)$.
+    If we could invert $f$, we would be able to solve SAT by computing $f^{-1}(\Phi, 1^n)$.
 
-    So, if $\PP \neq \NP$ and $f, f^{-1} \in \fP$, hence $\PP = \NP$.
-    And vice versa, if $f \in fP, f^{-1} \not\in \fP$, hence we can solve SAT and $\PP = \NP$.
-    %TODO complete proof
+    Therefore, if $\PP \neq \NP$ and both $f$ and $f^{-1}$ belong to $\fP$, it would imply $\PP = \NP$.
+    Conversely, if $\PP = \NP$, then $f^{-1} \not\in \fP$.
+\end{proof}
+
+\begin{exercise}
+	Prove the converse of our "worst-case theorem": if there exists an $f$ such that $f \in  \fP$ and $f^{-1} \not\in \fP$, then $\PP \neq \NP$.
+\end{exercise}
+
+\begin{proof}
+	Assume that $f \in  \fP$, $f^{-1} \not\in  \fP$, and that $\PP = \NP$.
+	In this case, we could invert $f$ by nondeterministically guessing a satisfying assignment, which can be verified in polynomial time.
+	Consequently, such a nondeterministic algorithm could be transformed into a deterministic one, given that $\PP = \NP$.
 \end{proof}
 
 \begin{statement}
-    The are $2^{2^n}$ functions $\{0, 1\}^n \to \{0, 1\}^*$ and $2^{O(n \cdot 2^{\sqrt n})}$ circuits of size $\leq 2^{\sqrt n}$.
+    There are $2^{2^n}$ functions from $\{0, 1\}^n$ to $\{0, 1\}$ and $2^{O(n \cdot 2^{\sqrt n})}$ circuits of size $\leq 2^{\sqrt n}$.
 \end{statement}
 
 \begin{exercise}
-    Almost all length-preserving functions have \"similar\" circuit complexity in both directions.
+    Show that almost all length-preserving functions have "similar" circuit complexity in both directions.
 \end{exercise}
 
-It means that one-way functions are rare.
+\begin{proof}
+	Intuitively, this follows from the fact that the inversion of a random function is also "random."
+\end{proof}
 
-We will define one-way functions formally.
-Let $f \colon \{0, 1\}^n \to \{0, 1\}^*$.
-Consider family of sliced functions: $f_i \colon \{0, 1\}^i \to \{0, 1\}^i$.
-And more general $f_i \colon \{0, 1\}^{n(i)} \to \{0, 1\}^{m(i)}$ for some polynomials.
+This suggests that one-way functions are rare.
+We now formally define one-way functions.
+Let $f \colon \{0, 1\}^* \to \{0, 1\}^*$.
+Consider a family of sliced functions: $f_i \colon \{0, 1\}^i \to \{0, 1\}^i$, or more generally, $f_i \colon \{0, 1\}^{n(i)} \to \{0, 1\}^{m(i)}$ for some polynomials $n(i)$ and $m(i)$.
+
 \begin{definition}
-    We say that function $f \colon \{0, 1\}^* \to \{0, 1\}^*$ with slices $\{f_n\}_{n \in \N}$ is \emph{one-way} if:
+    We say that a function $f \colon \{0, 1\}^* \to \{0, 1\}^*$ with slices $\{f_n\}_{n \in \N}$ is \emph{one-way} if:
     \begin{itemize}
         \item $f_n \colon \{0, 1\}^n \to \{0, 1\}^n$ can be computed in time $\poly(n)$.
-        \item For every polynomial-time randomized adversary $A$, for every $k$
+        \item For every polynomial-time randomized adversary $A$ and for every integer $k$,
         \[
-            \Pr[A(f_n(x)) \text{ inverts } f_n] < \frac 1 {n^k},
-        \] here $\Pr$ is over $x$ from $U_n$ and $A$'s randomness.
+            \Pr[A(f_n(x)) \text{ inverts } f_n] < \frac{1}{n^k},
+        \] 
+        where the probability is taken over $x$ chosen uniformly from $U_n$ and over the randomness of $A$.
     \end{itemize}
 \end{definition}
 
-Adversary's algorithm can be uniform or non-uniform (circuit).
-This does not matter for us in most cases.
-We will try to highlight when it matters.
+The adversary's algorithm may be either uniform or non-uniform (i.e., circuit-based).
+In most cases, this distinction is not relevant for our purposes; however, we will emphasize cases where it becomes significant.
 
 \begin{definition}
-    Sequence $t_1, t_2, \ldots$ is \emph{negligible} if for every $k$ and every $n$ large enough,
+    We say that a sequence $t_1, t_2, \ldots$ is \emph{negligible} if, for every $k$, there exists an $n$ sufficiently large such that
     \[
-        t_n < \frac 1 {n^k}.
+        t_n < \frac{1}{n^k}.
     \]
-
-    And non-negligible if there is $k$ such that for every $n$ large enough, $t_n \geq \frac 1 {n^k}$
-\end{definition}
-
-
-On practice, one would like to be able to invert his function but at the same time wants that others cannot invert it.
-Hence, we need the next definition.
-\begin{definition}
-    \emph{One way function family (owff)} is a deterministic polynomial-time algorithm $G \colon (1^n, r_g) \to (s_n, e_n)$ that generates two Boolean circuits:
-    \begin{itemize}
-        \item $e_n \colon \{0, 1\}^n \to \{0, 1\}^{m(n)}$ (the function itself)
-        \item $s_n \colon \{0, 1\}^{\sigma(n)} \to \{0, 1\}^n$ (sampler, takes random bits and produces some distribution)
-    \end{itemize}
-    such that for all $A$ (adversary, randomized poly-time) and $\forall k \in N \; \exists N \colon \forall n > N$
+    
+    Conversely, a sequence is \emph{non-negligible} if there exists a constant $k$ such that, for every sufficiently large $n$, 
     \[
-        \Pr[A(e_n(s_n(r_s)), 1^n, e_n, s_n) \in e^{-1}(e_n(s_n(r_s)))] < \frac 1 {n^k},
-    \] where $\Pr$ is over $A$'s randomness and uniformly distributed $r_g, r_s$.
-    Basically it says that over function cannot be easily inverted.
-    See \Cref{fig:2fc91310-fbf1-4d04-abdb-24f1fdf8893a}.
- \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.4\textwidth]{figures/2FC91310-FBF1-4D04-ABDB-24F1FDF8893A}
-        \caption{Schema.}
-        \label{fig:2fc91310-fbf1-4d04-abdb-24f1fdf8893a}
-    \end{figure}
+        t_n \geq \frac{1}{n^k}.
+    \]
 \end{definition}
 
-Usually our owf's will be nice:
+In practice, one may desire to invert their own function while preventing others from inverting it.
+This leads us to the next definition.
+
+\begin{definition}
+    A \emph{one-way function family (OWFF)} is a deterministic polynomial-time algorithm $G \colon (1^n, r_g) \to (s_n, e_n)$ that generates two Boolean circuits:
+    \begin{itemize}
+        \item $e_n \colon \{0, 1\}^n \to \{0, 1\}^{m(n)}$ (the function itself),
+        \item $s_n \colon \{0, 1\}^{\sigma(n)} \to \{0, 1\}^n$ (a sampler, which takes random bits and produces a specified distribution).
+    \end{itemize}
+    The following property must hold: for all polynomial-time randomized adversaries $A$ and for every $k \in \N$, there exists an $N$ such that for all $n > N$,
+    \[
+        \Pr[A(e_n(s_n(r_s)), 1^n, e_n, s_n) \in e^{-1}(e_n(s_n(r_s)))] < \frac{1}{n^k},
+    \]
+    where the probability $\Pr$ is taken over the randomness of $A$ and the uniformly distributed $r_g$ and $r_s$.
+\end{definition}
+
+In most cases, the sampler will be an identity function.
+Here, $r_g$ serves as a seed for the generator $G$, as the generator would be ineffective if it output only a single function every time.
+
+Essentially, this definition implies that the function cannot be easily inverted.
+See \Cref{fig:2fc91310-fbf1-4d04-abdb-24f1fdf8893a}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/2FC91310-FBF1-4D04-ABDB-24F1FDF8893A}
+    \caption{Schema.}
+    \label{fig:2fc91310-fbf1-4d04-abdb-24f1fdf8893a}
+\end{figure}
+
+Our one-way functions will typically possess the following properties:
 \begin{itemize}
-    \item length-regular: $|x| = |y| \implies |f(x)| = |f(y)|$ (typically),
-    \item length-preserving: $|f(x)| = |x|$ (sometimes),
-    \item length-poly-bounded: $|x|^{\Omega(1)} \leq |f(x)| \leq |x|^{O(1)}$ (always),
-    \item not necessarily defined on each length,
-    \item can be goodly sliced.
+    \item \textbf{Length-regularity:} $|x| = |y| \implies |f(x)| = |f(y)|$ (commonly holds),
+    \item \textbf{Length-preservation:} $|f(x)| = |x|$ (sometimes holds),
+    \item \textbf{Length-poly-boundedness:} $|x|^{\Omega(1)} \leq |f(x)| \leq |x|^{O(1)}$ (always holds),
+    \item Not necessarily defined on each length,
+    \item Can be suitably partitioned into slices.
 \end{itemize}
 
-\begin{definition}
-    \emph{Strong owf} is an owf such that for all $k$ an adversary cannot reach success probability $1/n^k$.
+\begin{exercise}
+    Consider the existence of the following:
+    \begin{itemize}
+        \item one-way functions,
+        \item one-way functions with the above properties,
+        \item families of one-way functions.
+    \end{itemize}
+    Determine what is equivalent, what is not, and what remains unclear.
+    Note that a family contains more than one pair $(s_n, e_n)$ for each $n$.
+\end{exercise}
 
-    \emph{Weak owfs} are such that $\exists k$ an adversary cannot reach success probability $1/n^k$.
+\begin{definition}
+    A \emph{strong one-way function (OWF)} is an OWF such that, for all $k$, an adversary cannot achieve a success probability greater than $\frac{1}{n^k}$.
+
+    \emph{Weak one-way functions (OWFs)} are those for which there exists a constant $k$ such that an adversary cannot achieve a success probability greater than $1 - \frac{1}{n^{k}}$.
 \end{definition}
 
 \begin{theorem}
-    Each weak owf can be transformed into strong owf.
+    Each weak one-way function (OWF) can be transformed into a strong OWF.
 \end{theorem}
+
 \begin{proof}
-    Let $f_w$ be a weak owf.
+    Let $f_w$ be a weak OWF.
+    Define the function
     \[
-        f_s(x_1, \ldots x_m) = (f_w(x_1), \ldots, f_w(x_m)),
+        f_s(x_1, \ldots, x_m) = (f_w(x_1), \ldots, f_w(x_m)),
     \]
-    for some polynomial $m = m(n) = \Omega(n)$.
+    where $m = m(n) = \Omega(n)$ is some polynomial.
 
-    Assume that $A_s$ inverts $f_s$ with $\Pr \geq 1/n^k$.
-    We will construct $A_w$ that breaks $f_w$.
-    $A'_w(y)$:
+    Assume there exists an adversary $A_s$ that inverts $f_s$ with probability at least $\frac{1}{n^{k_s}}$.
+    We will construct an adversary $A_w$ that breaks $f_w$.
+    
+    The construction of $A'_w(y)$ is as follows:
     \begin{itemize}
-        \item for each $j \in [m]$,
-        \item take $x_1, \ldots, x_m$ at random,
-        \item let $x = A_s(f_w(x_1), \ldots, f_w(x_{j - 1}), y, f_w(x_{j + 1}), \ldots, f_w(x_m))_j$,
-        \item if $f_w(x) = y$, return $x$.
+        \item For each $j \in [m]$,
+        \item Select $x_1, \ldots, x_m$ uniformly at random,
+        \item Let $x = A_s(f_w(x_1), \ldots, f_w(x_{j - 1}), y, f_w(x_{j + 1}), \ldots, f_w(x_m))_j$,
+        \item If $f_w(x) = y$, return $x$.
     \end{itemize}
-    Final $A_w$ repeats $A'_w(y)$ for $a(n)$ times and returns the majority answer.
-    The concrete polynomial will be given later.
+    
+    Finally, $A_w$ repeats $A'_w(y)$ for $a(n) = \poly(n)$ times and returns the most frequently occurring result.
+    The precise choice of $a(n)$, a suitable polynomial, will be determined later.
 
-    Let $S$ be a success set for $A'_w$:
+    Let $S$ denote the success set for $A'_w$:
     \[
-        S = \{y \in \{0, 1\}^n \mid \Pr[A'_w \text {inverts } f_w \text{ in } y] > \frac n {a(n)}\}.
+        S = \left\{y \in \{0, 1\}^n \mid \Pr[A'_w \text{ inverts } f_w \text{ on } y] > \frac{n}{a(n)}\right\}.
     \]
-    Hence, overall success of $A_w$ is at least
+    The overall success probability of $A_w$ is then at least
     \begin{align*}
-        \Pr[y \in S] &\cdot \underbrace{\Pr[A_w \text{ inv. } f_w \text{ in } y \mid y \in S]}_{1 - (1 - \frac 1 {a(n) / n})^{a(n)}} \approx \\
-        &\approx \Pr[y \in S] \cdot \left(1 - \frac 1 {e^n}\right).
+        \Pr[y \in S] &\cdot \underbrace{\Pr[A_w \text{ inverts } f_w \text{ on } y \mid y \in S]}_{1 - (1 - \frac{n}{a(n)})^{a(n)}}\\
+					 &= \Pr[y \in S] \cdot \left( 1 - \left(\left( 1 - \frac{1}{a(n) / n} \right)^{a(n) / n}\right)^{n}  \right) \\
+					 &\approx \Pr[y \in S] \cdot \left(1 - \frac{1}{e^n}\right).
     \end{align*}
+
     \begin{claim}
-        $\Pr[x \in S] \geq 1 - \frac 1 {mn}$, where $m$ is a number of copies.
+        $\Pr[y \in S] \geq 1 - \frac{n}{m}$, where $m$ is the number of copies.
     \end{claim}
-    As we prove it the probability of success would be enough to break $f_w$ as we choose $m$.
+    
     \begin{proof}
-        Assume that $\Pr[x \in S] < 1 - \frac 1 {mn}$.
+        Assume that $\Pr[y \in S] < 1 - \frac{n}{m}$.
+        Then,
         \[
-            \Pr[A_s \text{ succeeds}] \leq \Pr[x_i \in S \; \forall i \in [m]] + \Pr[\text{success if not all in } S].
+            \Pr[A_s \text{ succeeds}] \leq \Pr[x_i \in S, \; \forall i \in [m]] + \Pr[\text{success if not all in } S].
         \]
         \begin{itemize}
-            \item Since $\Pr[x \in S] < 1 - \frac 1 {mn}$ we have \[
-                      \text{All } \leq ((1 - \frac 1 {m/n})^{m/n})^n \approx \frac 1 {e^n}.
+            \item Since $\Pr[y \in S] < 1 - \frac{n}{m}$, we have 
+            \[
+                \text{All in } S \leq \left( 1 - \frac{n}{m} \right)^{m}  = \left(\left(1 - \frac{1}{m/n}\right)^{m/n}\right)^n \approx \frac{1}{e^n}.
             \]
-            \item \[\text{Not all } \leq \frac n {a(n)} \cdot m\].
-            Because $y \not \in S$ and we try $m$ times to extract the answer.
+            \item If not all $x_i$ are in $S$, then the probability of success is at most $\frac{n}{a(n)} \cdot m$, as we assume none of the $x_i$ are in $S$.
         \end{itemize}
-        Let $a(n)$ be much, much bigger than $m$.
+        Therefore, the sum of these probabilities is at most
+        \[
+            \frac{1}{e^{n}} + \frac{n}{a(n)} \cdot m.
+        \]
+        By choosing $a(n)$ sufficiently larger than $m$, it follows that $A_s$ does not successfully invert $f_s$.
     \end{proof}
 
+    Using this claim, we conclude that the success probability of $A_w$ is at least
+    \[
+        \Pr[y \in S] \cdot \left(1 - \frac{1}{e^{n}}\right) \ge \left(1 - \frac{n}{m}\right) \cdot \left(1 - \frac{1}{e^{n}}\right).
+    \]
 \end{proof}
 
 \begin{example}
     Let $f(a, b) = a \cdot b$.
-    It can invert a lot of times simply because $a \cdot b$ is usually disible by two.
+    This function can often be inverted due to the fact that $a \cdot b$ is typically divisible by~two.
 \end{example}
 
 \begin{example}
-    Let $f(p, q) = p \cdot q$, where $p, q \in \mathbb P$, $p < q$ and $\log p \approx \log q$.
+    Let $f(p, q) = p \cdot q$, where $p, q \in \mathbb{P}$, $p < q$, and $\log p \approx \log q$.
 \end{example}
 
 \begin{example}
+    Define the function
     \[
-        f(x_1, \ldots, x_n, I) = (x1, x2, \ldots, x_n, \sum_{i \in I} x_i]),
-    \] where $I \subseteq [n]$.
+        f(x_1, \ldots, x_n, I) = (x_1, x_2, \ldots, x_n, \sum_{i \in I} x_i),
+    \]
+    where $I \subseteq [n]$.
+	This corresponds to the \emph{Subset Sum} problem, which is $\NP$-complete.
 \end{example}
 
 \begin{example}[Discrete logarithm]
-    Take $p \in \mathbb P$.
-    Take $g$ a generator in $\mathbb F_p$.
-    Consider $x \in \Z_{p - 1}$.
-    And let
+    Take $p \in \mathbb{P}$.
+    Let $g$ be a generator in $\mathbb{F}_p$, and consider $x \in \mathbb{Z}_{p - 1}$.
+    Define
     \[
         f(x) = g^x \mod p.
     \]
-    It is called logarithm since to invert it we need to find $\log_g(g^x)$.
+    This function is called a logarithm because, to invert it, one must find $\log_g(g^x)$.
 \end{example}
 
 \begin{definition}
-    We say that $f$ can be reduced to $g$ ($f \to g$) is there is randomized poly-time algorithm $T^{\bullet}$ such that.
-    For all $k_f$ there is $k_g$ and any adversary $A$ such that.
-    If $A$ inverts $g$ with $\Pr \geq 1 - \frac{1}{n^{k_g}}$, then there is some $T^A$ that inverts $f$ with $\Pr \geq 1 - \frac{1}{n^{k_f}}$.
+    We say that $f$ can be reduced to $g$ (denoted $f \to g$) if there exists a randomized polynomial-time algorithm $T^{\bullet}$ such that, for all values of $k_f$, there exists a corresponding $k_g$ satisfying the following condition:
+    For any adversary $A$, if $A$ inverts $g$ with probability at least $1 - \frac{1}{n^{k_g}}$, then there is an algorithm $T^A$ that inverts $f$ with probability at least $1 - \frac{1}{n^{k_f}}$.
 \end{definition}
 
 \begin{theorem}[Universal one-way function]
-    There is a universal weak one-way function $u$, i.e. $\forall f \in \fP$ it implies that $f \to u$.
+    There exists a \emph{universal} weak one-way function $u$ such that for all $f \in \fP$, we have $f \to u$.
 \end{theorem}
+
 \begin{proof}
-    Let $u(M, x) = (M, M(x))$, where $x \in \{0, 1\}^*$ and $M$ is a description of a Turing machine.
-    And $M(x)$ is the output of $M$ on $x$ within $|x|^2$ steps (just to be able to compute $u$).
+    Define $u(M, x) = (M, M(x))$, where $x \in \{0, 1\}^*$ and $M$ is a description of a Turing machine.
+    Here, $M(x)$ denotes the output of $M$ on input $x$ within $|x|^2$ steps (to ensure that $u$ is computable).
+
     \begin{lemma}
-        Without loss of generality, a weak owf is computable in $|x|^2$ steps.
+        Without loss of generality, a weak OWF $f$ is computable within $|x|^2$ steps.
     \end{lemma}
+    
     \begin{proof}
-        Let $\tilde f(x_1, x_2) = f(x_1) \circ x_2$, where $|x_1| = n, |x_2| = m = m(n)$.
-        We choose $m(n)$ such that $(|x_1| + |x_2|)^2$, hence we can compute $\tilde f$ in $|x|^2$ time.
+        Define an extended function $\tilde{f}(x_1, x_2) = f(x_1) \circ x_2$, where $|x_1| = n$ and $|x_2| = m = m(n)$.
+        Choose $m(n)$ such that $(|x_1| + |x_2|)^2$ steps suffice to compute $f(x_1) \circ x_2$.
     \end{proof}
 
-    We will demonstrate that if we can invert $f^*$ computed by $M^*$ using an inverter for $u$.
-    After we fixed $M^*$, the proportion of inputs of the form $(M^*, \cdot)$ is a constant (because we fixed a prefix).
-    Hence, we still can invert a large proportion of inputs for $f^*$.
+    Let $M^*$ be a Turing machine that computes the fixed function $f$.
+    Then $u(M^*, x)$ computes $M^*(x)$ for a fraction $\mu = \frac{1}{2^{O(|M^{*}|)}} = \const$ of inputs.
+    Therefore, if we invert all but a fraction of $\frac{1}{n^{k}}$ of $u$'s inputs, we can also invert sufficiently many inputs of the form $u(M^*, x)$, specifically, at least a fraction of $\mu - \frac{1}{n^{k}}$, which corresponds to $v = 1 - \frac{1}{\mu n^{k}}$ in terms of $M^*$ on inputs of length $n - |M^*|$.
+    Thus, we can invert $f$.
 \end{proof}
 
 \begin{exercise}
-    What about strong owf?
+    Consider the case of a strong one-way function (OWF).
+    How does the analysis differ in this context?
 \end{exercise}
 
 \begin{exercise}
-    What about when we have deterministic or non-uniform adversaries?
+    What about deterministic or non-uniform adversaries?
 \end{exercise}
 
 \subsection{Trapdoor function}
 
-Simply we define a function that we can invert, but nobody else couldn't.
+We now define a function that can be inverted by its creator, yet remains infeasible to invert for others.
+
 \begin{definition}
-    \emph{Trapdoor function family (tdff)} is a collection of poly-time functions $e_n, d_n$ such that $d_n(e_n(x)) = x$ and for every adversary $A$,
+    A \emph{trapdoor function family (TDFF)} is a collection of polynomial-time functions $e_n$ and $d_n$ such that $d_n(e_n(x)) = x$, and for any adversary $A$,
     \[
-        \Pr[A \text{ inverts } e_n \text{ in } x] \text{ is neglibible}.
+        \Pr[A \text{ inverts } e_n \text{ on } x] \text{ is negligible}.
     \]
 \end{definition}
-The problem is that there is no uniform algorithm $D(n, x)$ for $d_n$ since it is not invertible in polynomial time.
-More accurate one:
+
+The challenge lies in the fact that there is no uniform algorithm $D(n, x)$ for computing $d_n$, as $d_n$ is not invertible in polynomial time. A more precise definition follows.
+
 \begin{definition}
-    Tdff is a deterministic poly-time $G \colon (1^n, r_g) \to (e, s)$ (Boolean circuits) such that:
+    A TDFF is a deterministic polynomial-time algorithm $G \colon (1^n, r_g) \to (e, d, s)$ that generates Boolean circuits with the following properties:
     \begin{itemize}
-        \item $e \colon \{0, 1\}^n \to \{0, 1\}^{s(n)}$ (encryptor)
-        \item $d \colon \{0, 1\}^{s(n)} \to \{0, 1\}^n$ (decryptor)
-        \item $s \colon \{0, 1\}^{\sigma(n)} \to \{0, 1\}$ (sampler),
+        \item $e \colon \{0, 1\}^n \to \{0, 1\}^{s(n)}$ (the encryptor),
+        \item $d \colon \{0, 1\}^{s(n)} \to \{0, 1\}^n$ (the decryptor),
+        \item $s \colon \{0, 1\}^{\sigma(n)} \to \{0, 1\}$ (a sampler).
     \end{itemize}
-    such that for all $x \in \Im(s)$ we have $d(e(x)) = x$ and for all adversary $A$ we have.
-    For all $k \in \N$ there is $N$ such that for all $n > N$,
+    These satisfy the property that, for all $x \in \text{Im}(s)$, we have $d(e(x)) = x$. Moreover, for every adversary $A$ and for every $k \in \mathbb{N}$, there exists an $N$ such that for all $n > N$,
     \[
-        \Pr[A(e(s(r_s)), 1^n, e, s) \in e^{-1}(e(s(r_s)))] < \frac 1 {n^k},
-    \] where $G(1^n, r_g) = (e, d, s)$ and $\Pr$ is taken over $A$'s randomness and over uniformly distributed $r_g, r_s$.
+        \Pr[A(e(s(r_s)), 1^n, e, s) \in e^{-1}(e(s(r_s)))] < \frac{1}{n^k},
+    \]
+    where $G(1^n, r_g) = (e, d, s)$, and $\Pr$ is taken over the randomness of $A$ and the uniformly distributed $r_g$ and $r_s$.
 \end{definition}
-Basically, the most difficulty is in the random bits.
-Having $e$ and knowing which bits were used we can invert it.
-But without knowing them it is hard.
+
+Essentially, the main difficulty arises from the randomness in the bits.
+Given $e$ and knowledge of the specific bits used, inversion is feasible (as $d$ can be generated).
+However, without knowledge of these bits, inversion becomes computationally challenging.
 
 \begin{example}[RSA, Rivest-Shamir-Adleman]
-    Take $p, q \in \mathbb P$ (secret).
-    let $N = p \cdot q$ (known to everyone).
-    Pick $\eps, \delta$ from $\Z_N$ such that $\eps \cdot \delta = 1 \mod (p - 1)(q - 1)$ (secret).
-    And let $s(x) = x, \; e(x) = x^{\eps} \mod N, \; d(x) = x^{\delta} \mod N$.
+    Let $p, q \in \mathbb{P}$ (secret).
+    Define $N = p \cdot q$ (publicly known).
+    Choose $\epsilon, \delta$ from $\mathbb{Z}_N$ such that $\epsilon \cdot \delta = 1 \mod (p - 1)(q - 1)$ (secret).
+    Then define $s(x) = x$, $e(x) = x^{\epsilon} \mod N$, and $d(x) = x^{\delta} \mod N$.
 \end{example}
+
 \begin{proof}
-    Let's show that it works:
+    We show that this construction works:
     \[
-        d(s(x)) = x^{\eps \delta} \mod N = x \mod N.
-    \] By Fermat's theorem.
+        d(e(x)) = x^{\epsilon \delta} \mod N = x \mod N,
+    \]
+    by Fermat's Little Theorem.
 \end{proof}
