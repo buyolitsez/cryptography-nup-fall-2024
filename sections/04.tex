@@ -1,154 +1,205 @@
 %24.10.2024, lecture 4
 
 \subsection{Goldreich-Levin Theorem}
-
+\goldreichlevin*
 \begin{proof}[Proof of \Cref{thm:goldreich_levin}] \label{proof:goldreich_levin}
-  Assume we have an adversary that computes $B(x, r) = \langle x, r\rangle = \bigoplus_i x_i r_i$ from  $f(x), r$. 
-  Call that adversary $\tilde B(f(x), r)$.
-  We will try to invert  $f$.
-  Some notation (consider strings as bit vectors), let $e_i \coloneqq (0, 0, \ldots, 0, \underbrace{1}_i, 0, \ldots, 0)$.
+    Assume we have an adversary that computes $B(x, r) = \langle x, r \rangle \mod 2 = \bigoplus_i x_i r_i$ from $f(x)$ and $r$. 
+    Denote this adversary as $\tilde{B}(f(x), r)$.
+    We will attempt to invert $f$.
 
-  Then, 
-  \[
-    x_i = \langle x, r\rangle \oplus \langle x, r \oplus e_i \rangle = B(x, r) \oplus B(x, r \oplus e_i).
-  \] 
-  But we cannot just use $\tilde B(f(x), r) \oplus \tilde B(f(x), r \oplus e_i)$, since those decoding are not independent, since we can have a small probability of success.
+    For some notation, consider strings as bit vectors.
+    Let $e_i \coloneqq (0, 0, \ldots, 0, \underbrace{1}_i, 0, \ldots, 0)$, the vector with a single 1 in the $i$-th position and 0 elsewhere.
 
-  Let $\beta_r = \tilde B(f(x), r)$ and let  $\beta_{r \oplus e_i} = \tilde B(f(x), r \oplus e_i)$.
-  We can try to guess $\beta_{r \oplus e_i}$ and use $\beta_r$.
-  But we cannot check the correctness of it (without knowing all the $x$).
-  We will guess $\beta_s$ for logarithmically many  $s$ and check then. 
-  And the probability will be good, since $2^{O(\log n)} = n^{O(1)}$.
-
-  Sample $l = O (\log n)$ vectors  $r^j$ at uniform from  $U_n$.
-  Try all possible bits  $\beta^j$ for  $B(x, r^j)$ (and assume we guessed the correct ones).
-  Now, for every non-empty set  $J \subseteq \{1, \ldots, l\}$ compute
-  \[
-    r^J = \oplus_{j \in J} r^j \qquad \beta^J = \oplus_{j \in J} \beta^j.
-  \] 
-
-  Then, those $\beta^J$ are correct, as  $\langle x, s \rangle \oplus \langle x, t \rangle = \oplus_i x_i (s_i \oplus t_i) = \langle x, s \oplus t \rangle.$
-  Hence, we compute 
-   \[
-    x_{i}^J = \beta^J \oplus \tilde B(f(x), r^J \oplus e_i).
-  \] 
-  And let $\tilde x_i = \text{maj} x_i^J$.
-  Let's prove that we've found correct input with high probability.
-  Assume that $\tilde B$ succeeds with probability  $\frac{1}{2} + \delta$ and $\delta = \frac{1}{n^{k}}$.
-
-   \begin{lemma}
-    Many inputs of $\tilde B$ are correct whp:
-	 \[
-		 \left|\left\{x \in \{0,1\}^n \mid \Pr[\tilde B(f(x), r) = B(x, r)] \geq \frac{1}{2} + \frac{\delta}{2}\right\}\right| \geq \delta \cdot 2^n.
-	\] 
-  \end{lemma}
-  \begin{proof}
-	  Let 
-	  \[
-		  S_n = \left\{x \in \{0,1\}^n \mid \Pr\left[\underbrace{\tilde B(f(x), r) = B(x, r)}_{S(x)}\right] \geq \frac{1}{2} + \frac{\delta}{2}\right\}.
-	  \] 
-	  Now we will proof by counting argument:
+    Then, we can express $x_i$ as:
     \[
-		|U_n \setminus S_n| = 2 ^{n} \cdot \Pr_x \left[S(x) < \frac{1}{2} + \frac{\delta}{2}\right] = 2^{n} \cdot \Pr_x \left[1 - S(x) \geq \underbrace{\frac{1}{2} - \frac{\delta}{2}}_{\alpha^*}\right],
+        x_i = \langle x, r \rangle \oplus \langle x, r \oplus e_i \rangle = B(x, r) \oplus B(x, r \oplus e_i).
     \] 
-	so this means that
-	\[
-		\E_x[1 - S(x)] \geq 1 - \left(\frac{1}{2} + \delta\right) = \frac{1}{2} - \delta.
-	\] 
-	Using Markov's inequality we have that:
-	\[
-		\Pr_x \left[1 - S(x) \geq \frac{1}{2} - \frac{\delta}{2}\right] \leq \frac{\frac{1}{2} - \delta}{\frac{1}{2} - \frac{delta}{2}} \leq 1 - \delta.
-	\] 
-  \end{proof}
+    However, we cannot simply use $\tilde{B}(f(x), r) \oplus \tilde{B}(f(x), r \oplus e_i)$, since these computations might not be independent.
 
-  \begin{lemma}
-    $r^J \in U_n$ and  $r^J, r^K$ are independent for  $J \neq K$.
-  \end{lemma}
-  \begin{proof}
-    If $K \subseteq J$, then
-	 \begin{align*}
-		 \Pr[r^j = t, r^k = t'] &= \Pr[r^{J \setminus K} = t \oplus t', r^{K} = t'] = \\
-								&= \Pr[r^{J \setminus K} = t \oplus t'] \cdot \Pr[r^K = t'] = \Pr[r^J = t] \cdot \Pr[r^k = t'],
-	 \end{align*} where last equality follows from the fact that $r^j$ are distributed uniformly. 
+    Define $\beta_r = \tilde{B}(f(x), r)$ and $\beta_{r \oplus e_i} = \tilde{B}(f(x), r \oplus e_i)$.
+    We could attempt to guess $\beta_{r \oplus e_i}$ and use $\beta_r$, but we lack a way to verify its correctness without knowing the full $x$.
+    Instead, we will guess values $\beta_s$ for a logarithmic number of vectors $s$ and then verify these guesses, leveraging the fact that $2^{O(\log n)} = n^{O(1)}$, so this approach remains computationally feasible.
 
-	 Otherwise, $J \setminus K \neq \varnothing$ and  $K \setminus J \neq \varnothing$, hence
-	 \begin{align*}
-		 \Pr[r^J = t, r^K = t'] &= \sum_{t''} \Pr[r^J = t, r^K = t', r^{J \cap K} = t''] \\
-								&= \sum_{t''} \Pr[r^{J \setminus K} = t \oplus t'', r^{K \setminus J} = t' \oplus t'', r^{J \cap K} = t''] \\
-								&= \sum_{t''} \Pr[r^{J \setminus K} = t \oplus t''] \cdot \Pr[r^{K \setminus J} = t' \oplus t''] \cdot \Pr[r^{J \cap K} = t''] \\
-								&= \Pr[r^{J} = t] \cdot \Pr[r^{K} = t'].
-	 \end{align*}
-  \end{proof}
-
-  Let $\xi_i^j \coloneqq [x_i = x_i^J]$ be an event that we decoded correctly.
-   \begin{lemma}
-	   For $x \in S_n, i \in [n]$ and big enough $n$ we have:
+    Sample $l = O(\log n)$ vectors $r^j$ uniformly from $U_n$.
+    Try all possible bit values $\beta^j$ for $B(x, r^j)$, assuming that our guesses are correct.
+    For each non-empty set $J \subseteq \{1, \ldots, l\}$, compute
     \[
-		\Pr\left[\sum_J \xi_i^J \leq \frac{2^{l} - 1}{2}\right] \leq \frac{1}{2n}.
+        r^J = \bigoplus_{j \in J} r^j, \qquad \beta^J = \bigoplus_{j \in J} \beta^j.
     \] 
-  \end{lemma}
-  \begin{proof}
-	  We put $l = (2k + 2) \log_2 n$ and let  $m = 2^{l} - 1$.
-	  It is easy to see that
-	  \[
-		  \E\left[\sum_J \xi_i^J\right] \geq m(\frac{1}{2} + \frac{\delta}{2}).
-	  \]
-	  Since we have pairwise independence we have that $\Var(\sum_J \xi_i^J) = m \cdot \Var(\xi_i^J) \leq m$ (since the variance is no more than 1).
-	  Then using Chebyshev's inequality we have that:
-	   \[
-		   \Pr\left[\sum_J \xi_i^J < m\left(\frac{1}{2} + \frac{\delta}{2}\right)\right] \leq \frac{4 m \Var(\xi_i^J)}{m^2 \delta^2} \leq \frac{4}{m \delta^2} \leq \frac{4}{n^2} \leq \frac{1}{2n}.
-	  \] 
-  \end{proof}
 
-  Having those Lemmas, we try all possible $\beta^j$ for the basic vectors  $r^j$.
-  Then, for correct $\beta$'s most answers  $x_i^J$ are correct whp.
-  Therefore we computed correct  $x_i$ by using majority with probability  $\geq \frac{1}{2}$ and wsp in total.
-  Given all $x_i$'s check that we decoded $f(x)$ correctly.
+	Assuming that we've guessed all $\beta^{j}$ correctly it is clear that $\beta^{J} = B(x, r^{J})$, since
+	\[
+		B(x, r^{J}) = \left< x, r^{J} \right> = \bigoplus_{j \in J} \left< x, r^{j} \right> = \bigoplus_{j \in J} \beta^{j} = \beta^{J}
+	.\] 
+    Therefore, we can compute 
+    \[
+        x_{i}^J = \beta^J \oplus \tilde{B}(f(x), r^J \oplus e_i),
+    \] with high probability.
+    Let $\tilde{x}_i = \maj\limits_J x_i^J$ (the majority value across different sets $J$).
+    We will now show that we have recovered the correct input with high probability.
+
+    Suppose that $\tilde{B}$ succeeds with probability $\frac{1}{2} + \delta$, where $\delta = \frac{1}{n^{k}}$.
+
+	\begin{lemma}
+		Many inputs of $\tilde{B}$ are correct with high probability:
+		 \[
+			 \left|\left\{x \in \{0,1\}^n \mid \Pr[\tilde{B}(f(x), r) = B(x, r)] \geq \frac{1}{2} + \frac{\delta}{2}\right\}\right| \geq \delta \cdot 2^n.
+		\] 
+	\end{lemma}
+
+	\begin{proof}
+		  Define 
+		  \[
+			  S_n = \left\{x \in \{0,1\}^n \mid \Pr\left[\underbrace{\tilde{B}(f(x), r) = B(x, r)}_{S(x)}\right] \geq \frac{1}{2} + \frac{\delta}{2}\right\}.
+		  \] 
+		  We will use a counting argument:
+		\[
+			|U_n \setminus S_n| = 2^{n} \cdot \Pr_x \left[S(x) < \frac{1}{2} + \frac{\delta}{2}\right] = 2^{n} \cdot \Pr_x \left[1 - S(x) \geq \underbrace{\frac{1}{2} - \frac{\delta}{2}}_{\alpha^*}\right],
+		\] 
+		which implies that
+		\[
+			\E_x[1 - S(x)] = 1 - \left(\frac{1}{2} + \delta\right) = \frac{1}{2} - \delta.
+		\] 
+		Using Markov's inequality, we obtain:
+		\[
+			\Pr_x \left[1 - S(x) \geq \frac{1}{2} - \frac{\delta}{2}\right] \leq \frac{\frac{1}{2} - \delta}{\frac{1}{2} - \frac{\delta}{2}} = \frac{1 - 2 \delta}{1 - \delta} = 1 - \frac{\delta}{1 - \delta} \leq 1 - \delta.
+		\] 
+	\end{proof}
+
+	\begin{lemma}
+		$r^J \in U_n$, and $r^J$ and $r^K$ are independent for $J \neq K$.
+	\end{lemma}
+
+	\begin{proof}
+		Since each $r^{j} \in  U_n$ it is clear that $r^{J} \in  U_n$.
+		If $K \subseteq J$, then
+		 \begin{align*}
+			 \Pr[r^J = t, r^K = t'] &= \Pr[r^{J \setminus K} = t \oplus t', r^{K} = t'] \\
+									&= \Pr[r^{J \setminus K} = t \oplus t'] \cdot \Pr[r^K = t'] = \Pr[r^J = t] \cdot \Pr[r^K = t'],
+		 \end{align*} 
+		 where the last equality follows from the fact that $r^J$ are distributed uniformly. 
+
+		 Otherwise, if $J \setminus K \neq \varnothing$ and $K \setminus J \neq \varnothing$, then
+		 \begin{align*}
+			 \Pr[r^J = t, r^K = t'] &= \sum_{t''} \Pr[r^J = t, r^K = t', r^{J \cap K} = t''] \\
+									&= \sum_{t''} \Pr[r^{J \setminus K} = t \oplus t'', r^{K \setminus J} = t' \oplus t'', r^{J \cap K} = t''] \\
+									&= \sum_{t''} \Pr[r^{J \setminus K} = t \oplus t''] \cdot \Pr[r^{K \setminus J} = t' \oplus t''] \cdot \Pr[r^{J \cap K} = t''] \\
+									&= \Pr[r^{J} = t] \cdot \Pr[r^{K} = t'] \cdot \underbrace{\sum_{t''} \Pr[r^{J \cap K} = t'']}_{=1}.
+		 \end{align*}
+	\end{proof}
+
+	Let $\xi_i^J \coloneqq [x_i = x_i^J]$ be the event that we decoded $x_i$ correctly.
+	Now, since $\delta = \frac{1}{n^{k}}$, put $l = (2k + 2) \log_2 n$ and $m = 2^{l} - 1$.
+
+	\begin{lemma}
+	   For any $x \in S_n$, $i \in [n]$, and sufficiently large $n$, we have:
+		\[
+			\Pr\left[\sum_J \xi_i^J \leq \frac{m}{2}\right] < \frac{1}{2n}.
+		\] 
+	\end{lemma}
+
+	\begin{proof}
+		Since for any $x \in  S_n$ we have that probability of a success is at least $\frac{1}{2} + \frac{\delta}{2}$, then it is straightforward to see that
+		\[
+			\E\left[\sum_J \xi_i^J\right] \geq m\left(\frac{1}{2} + \frac{\delta}{2}\right).
+		\]
+		Given pairwise independence, we have $\Var(\sum_J \xi_i^J) = m \cdot \Var(\xi_i^J) \leq m$ (since the variance of Boolean random variable is no more than 1).
+		Applying Chebyshev's inequality (in the form that $\Pr[\alpha < \E \alpha - \Delta] < \Var(\alpha) / \Delta^2$), we obtain:
+		\[
+			\Pr\left[\sum_J \xi_i^J < m\left(\frac{1}{2} + \frac{\delta}{2}\right) - \frac{m\delta}{2}\right] < \frac{4 \Var(\xi_i^J)}{m^2 \delta^2} \leq \frac{4}{m \delta^2} \leq \frac{4}{n^2} \leq \frac{1}{2n}.
+		\] 
+	\end{proof}
+
+	With these lemmas in place, we try all possible values of $\beta^j$ for the base vectors $r^j$.
+	For the correct choices of $\beta$, most values $x_i^J$ are correct with high probability.
+	Therefore, we compute the correct $x_i$ using the majority vote with probability $\geq \frac{1}{2}$, achieving high probability overall.
+	Once we have determined all $x_i$ values, we verify that we have correctly decoded $f(x)$.
 \end{proof}
 
-All of them are about the proof above.
+All of the exercises below relate to the proof above.
+
 \begin{exercise}
-  Do we really need length preserving owf?
+    Is it necessary for the one-way function (OWF) to be length-preserving?
 \end{exercise}
 
 \begin{exercise}
-  We need to know the success probability of $\tilde B$.
-  Get rid of it.
+    In the proof, we rely on knowing the success probability of $\tilde{B}$.
+    Can we reformulate the proof to avoid this requirement?
 \end{exercise}
 
 \begin{exercise}
-  What if $f$ is not injective?
+    How would the proof change if $f$ is not injective?
 \end{exercise}
 
 \section{Pseudorandom Generators}
 
 \begin{definition}
-  We say that $G \colon \{0,1\}^l \to \{0,1\}^{f(l)}$ is an $f(l)$-PRG if for every adversary  $A$, the distributions  $G(U_l)$ and  $U_{f(l)}$ are computationally indistinguishable.
+  We say that $G \colon \{0,1\}^l \to \{0,1\}^{f(l)}$ is an $f(l)$-PRG if, for every adversary $A$, the distributions $G(U_l)$ and $U_{f(l)}$ are computationally indistinguishable.
 \end{definition}
 
-If one creates such a generator for $f(l) = 2^{l}$, then it means that all poly-time randomized algorithm are in $\PP$! 
+If one creates such a generator for $f(l) = 2^{l}$, this implies that all polynomial-time randomized algorithms are contained in $\PP$!
 
-We introduce a public scheme encryption scheme:
+Recall our public-key encryption scheme:
 \[
-E^{**}(b_1, \ldots, b_m, e, r) = (e^{m}(r), B(r) \oplus b_1, B(e(r)) \oplus b_2, \ldots, B(e^{m - 1}(r)) \oplus b_m).
+E^{**}(b_1, \ldots, b_m, e, r) = \left(e^{m}(r), B(r) \oplus b_1, B(e(r)) \oplus b_2, \ldots, B(e^{m - 1}(r)) \oplus b_m\right).
 \] 
 
 \begin{theorem}
-  If one breaks $E^{**}$, then we can break a PRG.
+  If one can break $E^{**}$ (i.e., distinguish $0\ldots0$ from a random message), then one can also break a PRG.
 \end{theorem}
 
-Here, $e$ is a public function and  $d$ is a private invert functrion of  $e$.
-And $B$ is a hardcore predicate.
-Alice can easily decrypt the message using $d^{m}(e^{m}(r)) = r$, then she can compute other bits.
+Here, $e$ is a public function, while $d$ is a private inverse function of $e$.
+The function $B$ is a hardcore predicate.
+Alice can decrypt the message using $d^{m}(e^{m}(r)) = r$, allowing her to compute the other bits.
 
 \begin{lemma}
-	If $g$ is a length-preserving owp and  $B$ is its hardcore predicate, then there is an  $f(l)$-PRG:
+	If $g$ is a length-preserving one-way permutation (OWP) and $B$ is its hardcore predicate, then there exists an $f(l)$-PRG, defined by
 	 \[
-	  G_l(x) = g^{f(l) - l}(x) \circ B(x) \circ B(g(x)) \circ \dots \circ B(g^{f(l) - l - 1}(x)).
-	\] 
+	  G_{f(l)}(x) = g^{f(l) - l}(x) \circ B(x) \circ B(g(x)) \circ \dots \circ B(g^{f(l) - l - 1}(x)).
+	 \] 
 \end{lemma}
-\begin{proof}
-  Idea: if we distinguish $U$ from  $G_{f(l)}(U)$, then we distinguish  $G_i(U)$ and  $G_{i + 1}(U)$ for some $i$.
+This construction extends the input by $i$ bits.
+In the proof below, $U$ denotes a uniform distribution of strings of fixed length, though $U$ may refer to different lengths depending on the context.
 
-  \todo[inline]{finish}
+\begin{proof}
+  Idea: if we can distinguish $U$ from $G_{f(l)}(U)$, then there exists an index $i$ where we can distinguish between $G_i(U)$ and $G_{i + 1}(U)$.
+
+  Consider the case where one can distinguish between $U$ and $G_{1}(U)$.
+  Suppose that $G(x) = G_1(x) = g(x) \circ B(x)$ is broken by some adversary $A$:
+   \[
+	   \left| \underbrace{\Pr[A(G(x)) = 1]}_{\gamma} - \underbrace{\Pr[A(y) = 1]}_{\nu} \right| \ge \frac{1}{l^{k}}
+  ,\] 
+  where $y$ is distributed uniformly with length $|y| = |x| + 1$.
+  
+  Define two variables:
+   \begin{align*}
+	   \alpha &\coloneqq \Pr[A(g(x) \circ b) = 1  \mid b = B(x)] = \Pr[A(g(x) \circ B(x)) = 1] = \gamma,\\
+	   \beta &\coloneqq \Pr[A(g(x) \circ b) = 1  \mid b \neq  B(x)] = \Pr[A(g(x) \circ \overline{B(x)}) = 1].
+   \end{align*}
+  Thus,
+  \[
+	  \nu = \Pr[A(y) = 1] = \Pr[A(g(x) \circ b) = 1] = \Pr[b = B(x)] \cdot \alpha + \Pr[b \neq B(x)] \cdot \beta = \frac{\alpha + \beta}{2}.
+  \] 
+  Without loss of generality, we assume that $\frac{1}{l^{k}} \le \gamma - \nu = \alpha - \frac{\alpha + \beta}{2} = \frac{\alpha - \beta}{2}$ (otherwise, we simply flip all outputs of $A$).
+  
+  Our new adversary $A'$ computes $B(x)$ from $f(x)$: it picks a random bit $b \in U_1$ and, if $A(f(x) \circ b) = 1$, outputs $b$, otherwise it outputs $\overline{b}$.
+  
+  The probability of success is:
+  \begin{align*}
+	  \Pr[A'(f(x)) = B(x)] &= \Pr[b = B(x)] \cdot \Pr[A(f(x) \circ B(x)) = 1] + \\
+						   &+ \Pr[b = \overline{B(x)}] \cdot \Pr[A(f(x) \circ \overline{B(x)}) \neq 1] \\
+						   &= \frac{1}{2} \alpha + \frac{1}{2} (1 - \beta) = \frac{1}{2} + \frac{\alpha - \beta}{2} \ge  \frac{1}{2} + \frac{1}{l^{k}}.
+  \end{align*}
+  Thus, we can break $B$.
+
+  Now, suppose that an adversary $A$ can distinguish between $G_i(U)$ and $G_{i + 1}(U)$.
+  We will show that this implies an ability to distinguish between $U$ and $G_1(U)$.
+  
+  Let $x$ and $z$ be random variables (uniformly distributed) such that $|z| = |x| + 1$.
+  Then $A$ can distinguish between:
+   \begin{align*}
+	   G_{i + 1}(x) &= g^{i + 1}(x) \circ B(x) \circ B(g(x)) \circ \dots \circ B(g^{i}(x)),\\
+	   G_{i}(z) &= g^{i}(z) \circ B(z) \circ B(g(z)) \circ \dots \circ B(g^{i - 1}(z)).
+   \end{align*}
+  Hence, $A$ distinguishes between $g^{i + 1}(x) \circ B(x)$ and $g^{i}(z) \in U$.
 \end{proof}

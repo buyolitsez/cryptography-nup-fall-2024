@@ -47,7 +47,9 @@ Similarly, let $\FP$ denote the class of problems for which a~solution can be fo
 \end{exercise}
 
 \begin{proof}
-	Intuitively, this follows from the fact that the inversion of a random function is also "random."
+	There is a small number of length-preserving function that can be computed with polynomial size circuits.
+	Hence, it cannot happen that a lot of functions have both small circuits for computing and inverting.
+	And also small with small circuits in one direction and big in other.
 \end{proof}
 
 This suggests that one-way functions are rare.
@@ -97,6 +99,7 @@ This leads us to the next definition.
     \]
     where the probability $\Pr$ is taken over the randomness of $A$ and the uniformly distributed $r_g$ and $r_s$.
 \end{definition}
+By owp we denote one-way permutations.
 
 In most cases, the sampler will be an identity function.
 Here, $r_g$ serves as a seed for the generator $G$, as the generator would be ineffective if it output only a single function every time.
@@ -130,6 +133,11 @@ Our one-way functions will typically possess the following properties:
     Determine what is equivalent, what is not, and what remains unclear.
     Note that a family contains more than one pair $(s_n, e_n)$ for each $n$.
 \end{exercise}
+\begin{proof}
+	Hint: when owf has a sampler $s$, hence it works good only on sampler strings.
+	One can get rid of sampler by using a composition of the function with the sampler itself:  $f(r) = e(s(r))$.
+	Also, when one wants to get rid of the generator $G$, then random bits of $G$ can be included as arguments for a new function.
+\end{proof}
 
 \begin{definition}
     A \emph{strong one-way function (OWF)} is an OWF such that, for all $k$, an adversary cannot achieve a success probability greater than $\frac{1}{n^k}$.
@@ -264,6 +272,9 @@ Our one-way functions will typically possess the following properties:
     Consider the case of a strong one-way function (OWF).
     How does the analysis differ in this context?
 \end{exercise}
+\begin{proof}
+	Hint: you need to use also another result from the lecture.
+\end{proof}
 
 \begin{exercise}
     What about deterministic or non-uniform adversaries?
