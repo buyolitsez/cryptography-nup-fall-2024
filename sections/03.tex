@@ -228,23 +228,107 @@ Here, for $E$ we denote the encryption algorithm, and $e$ is the public code.
 \end{restatable}
 
 \begin{proof}
-	First, we prove that if a PKCS is semantically secure, then it is computationally indistinguishable.
-	So, if we have an adversary $A_l$ that can distinguish encrypted $m_0, m_1$, then we can break PKCS.
-	W.l.o.g. assume that pair $m_0, m_1$ has the best probability of success.
-	Let's put $f(m_i) \coloneqq i$ (hence, function basically distinguished between $m_0, m_1$), we are not interested into other inputs of $f$.
-	And let $h(x) = 0$ for any  $x$, so  $h$ gives no information.
-	New adversary  $A_s$ uses $A_l$ for  $m_0, m_1$ (which are hardwired into the circuit $M_S$), which has success probability $> \frac{1}{2} + \delta$.
-	Hence, $A_s$ breaks semantic security.
+	By $M_S$ we denote the circuit of the sampler.
 
-	Now, we will prove that if a PKCS is computationally indistinguishable, then it is semantically secure.
-	Assume that some adversary $A_s$ can compute  $f(m)$, then we will show that it is not computationally indistinguishable.
-	We will construct  $m_0, m_1$ with $f(m_0) \neq  f(m_1)$ that we will distinguish.
+	$\implies$. First, we prove that if a PKCS is semantically secure, then it is computationally indistinguishable.
+	Suppose we have an adversary $A_l$ that can distinguish encrypted messages $m_0$ and $m_1$.
+	In this case, we can use $A_l$ to break the PKCS.
+
+	Define $f(m_i) \coloneqq i$; this function essentially distinguishes between $m_0$ and $m_1$, and we are not concerned with the behavior of $f$ on other inputs.
+	Let $h(x) = 0$ for all $x$, so $h$ conveys no additional information.
+
+	Now, construct a new adversary $A_s$ that uses $A_l$ to distinguish between $m_0$ and $m_1$ (hardwired into the circuit $M_S$).
+	The success probability of $A_s$ is greater than $\frac{1}{2} + \delta$.
+	Thus, $A_s$ breaks semantic security.
+
+	$\Longleftarrow$. Now, we will prove that if a PKCS is computationally indistinguishable, then it is semantically secure.
+	Assume that some adversary $A_s$ can compute $f(m)$ with some hint function $h$ (i.e., the scheme is not semantically secure).
+	We will show that this implies the scheme is not computationally indistinguishable.
+
+	For a fixed pair $m_0, m_1$, define:
+	\begin{align*}
+		p_k(x) &\coloneqq \Pr[A_s(E(e, x), e, h(m)) = k], \\
+		q_k(x) &\coloneqq \Pr[A_s(E(e, x), e, h(m_0)) = k], \\
+		f_i &\coloneqq f(m_i).
+	\end{align*}
+	Here, $p_k$ is the probability that $A_s$ decodes $x$ into $k$, while $q_k$ is the probability that $A_s$ decodes into $k$ given a potentially incorrect hint $m_0$.
+
+	\begin{lemma}
+		There exists a pair $m_0, m_1$ such that $f(m_0) \neq f(m_1)$ and 
+		\[
+			p_{f_0}(m_0) - q_{f_0}(m_1) \text{ ~is substantial}.
+		\] 
+	\end{lemma}
+
+	\begin{proof}
+		Suppose that for all $m_0, m_1$, we have $p_{f_0}(m_0) - q_{f_0}(m_1) < \varepsilon$.
+		Let $p(x)$ denote the probability of generating $x$, i.e., $p(x) = \Pr[M_s(1^{n}) = x]$.
+
+		Then, consider the following weighted sum, which is small:
+		\begin{align*}
+			&\sum_{m_0, m_1} p(m_0) p(m_1) (p_{f_0}(m_0) - q_{f_0}(m_1)) = \\
+			&\underbrace{\left(\sum_{m_1} p(m_1)\right)}_{=1} \cdot \left(\sum_{m_0} p(m_0) p_{f_0}(m_0)\right) + \sum_{m_0, m_1} p(m_0) p(m_1) q_{f_0}(m_1) = \\
+			&\sum_{m_0} p(m_0) p_{f_0}(m_0) + \sum_{m_0, m_1} p(m_0) p(m_1) q_{f_0}(m_1).
+		\end{align*}
+
+		The left sum represents the probability of success for the original $A_s$.
+		Now, let $F_k = \{x \mid f(x) = k\}$ and let $\mu_k = \Pr[M_S(1^{n}) \in F_k]$.
+		Then:
+		\begin{align*}
+			&\sum_{m_0, m_1} p(m_0) p(m_1) q_{f_0}(m_1) = \\
+			& \sum_{k} \sum_{m_0 \in F_k} \sum_{m_1} p(m_0) p(m_1) q_k(m_1) = \\   
+			& \sum_{k} \left(\left(\sum_{m_1} p(m_1) q_k(m_1) \right) \cdot \underbrace{\left(\sum_{m_0 \in F_k} p(m_0)\right)}_{\mu_k} \right) = \\
+			& \sum_{k} \mu_k \left( \sum_{m_1} p(m_1) q_k(m_1) \right).
+		\end{align*}
+
+		Now, we construct a new adversary $\tilde{A}_s(h_*)$, where $h_* = h(m_0)$ (hardcoded):
+		\begin{itemize}
+			\item Choose a random $m \in M_S$,
+			\item Encrypt $m$ and run $A_s(E(m, \ldots), h_*)$.
+		\end{itemize}
+		Therefore, the success probability of $\tilde{A}_s$ is exactly
+		\[
+		\sum_{k} \mu_k \left( \sum_{m_1} p(m_1) q_k(m_1) \right).
+		\] 
+		This implies that the success probability of $A_s$ is small, which is a contradiction.
+	\end{proof}
+
+	Now, choose $m_0, m_1$ such that $f(m_0) \neq f(m_1)$ and
+	\[
+		p_{f_0}(m_0) - q_{f_0}(m_1) > \varepsilon.
+	\] 
+
+	Define a new adversary $A_l$ that, given an encrypted message $m$, attempts to distinguish $m$ chosen from the set $\{m_0, m_1\}$ (each selected with probability $\frac{1}{2}$):
+	\begin{itemize}
+		\item If $A_s(E(e, m), e, h(m_0)) = f(m_0)$, then return 0.
+		\item Otherwise, flip a fair coin and return the result.
+	\end{itemize}
+	Note that we hardwire $f(m_0)$ and $h(m_0)$ into the circuit $A_l$.
+
+	Thus, the success probability of $A_l$ is at least:
+	\begin{align*}
+		\underbrace{\Pr[m_0 \text{ is sent}]}_{=\frac{1}{2}} \cdot \left(p_{f_0}(m_0) + (1 - p_{f_0}(m_0)) \cdot \frac{1}{2}\right) + \underbrace{\Pr[m_1 \text{ is sent}]}_{=\frac{1}{2}} \cdot \left((1 - q_{f_0}(m_1)) \cdot \frac{1}{2}\right) = \\
+		= \frac{1}{2} \left(1 + \frac{p_{f_0}(m_0) - q_{f_0}(m_1)}{2}\right).
+	\end{align*}
+	Therefore, this probability is substantial, and $A_l$ can distinguish between $m_0$ and $m_1$.
+	\end{proof}
+	Now, take such $m_0, m_1  \colon f(m_0) \neq  f(m_1)$ and
+	\[
+		p_{f_0}(m_0) - q_{f_0}(m_1) > \varepsilon
+	.\] 
+
 	New adversary $A_l$ given encrypted  $m$ distinguishes  $m$ which takes from set $\{m_0, m_1\} $ (each taken with probability $\frac{1}{2}$):
 	\begin{itemize}
 		\item If $A_s(E(e, m), e, h(m_0)) = f(m_0)$, then return 0.
 		\item Otherwise, flip a fair coin and return the result.
 	\end{itemize}
 	Note, that we hardwired $f(m_0), h(m_0)$ into the circuit $A_l$.
+	Hence, the probability of success of $A_l$ is at least:
+	\begin{align*}
+		 \underbrace{\Pr[m_0 \text{ is sent }]}_{=\frac{1}{2}} \cdot \left(p_{f_0}(m_0) + (1 - p_{f_0}(m_0)) \cdot \frac{1}{2}\right) + \underbrace{\Pr[m_1 \text{ is sent }]}_{=\frac{1}{2}} \cdot \left((1 - q_{f_0}(m_1)) \frac{1}{2}\right) = \\
+		 = \frac{1}{2} \left(1 + \frac{p_{f_0}(m_0) - q_{f_0}(m_1)}{2}\right).
+	\end{align*}
+	Hence, it is substantial and $A_l$ distinguish between  $m_0$ and  $m_1$.
 \end{proof}
 
 \subsection{More efficient PKCS}

@@ -1,17 +1,7 @@
 %31.10.2024, lecture 5
 
-\section{Lecture 5}
 
-\begin{definition}
-	A PKCS is semantically secure if $\forall f, \forall h, \forall A, \forall M$:
-	 \[
-		 \Pr[A(E(e, m), e, h(m)) = f(m)] \le  \Pr[\tilde A(e, h(m)) = f(m)] + \varepsilon(n)
-	.\] 
-	Where hint $h$ and  $f$ are poly-time computable.
-
-\end{definition}
-
-\subsection{Symmetric Encryption}
+\section{Symmetric Encryption}
 
 Assume that we have two participants and most messages are not lost.
 Let $G \colon \{0, 1\}^{n} \to  \{0, 1\}^{n + 1}$ be a PRG.
