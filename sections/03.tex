@@ -2,80 +2,242 @@
 
 \section{Public-Key Encryption Schemes}
 
-Alice holds public and secret keys.
-She wants to send a message to Bob, but the communication channel is being listened by adversary Eve.
-We want Eve to not be able to decrypt the message, even though she has seen a lot of communication (and perhaps some messages).
+Consider a scenario in which Alice holds both a public key and a private (secret) key.
+Alice wishes to send a message to Bob over a communication channel that is monitored by an adversary, Eve.
+Our goal is to ensure that Eve cannot decrypt the message, even though she may observe numerous communications (and potentially some plaintext messages).
+
+We know that one-way functions are difficult to invert in general.
+However, what if an adversary attempts to invert only a single bit of the output of a one-way function?
+This question introduces the concept of \emph{hardcore predicates}.
 
 \begin{definition}
-	A family of poly-time computable function $B_n \colon \{0, 1\}^n \to \{0, 1\}$ is a \emph{hardcore predicate} for  $f_n \colon \{0, 1\}^n \to \{0, 1\}^s$ if no adversary can guess $B_n(x)$ from  $f_n(x)$ with probability non-negligibly better than  $\frac{1}{2}$.
-	\[
-		\forall k \; \forall A \; \exists N \; \forall n > N \; \Pr[A(f_n(x)) = B_n(x)] < \frac{1}{2} + \frac{1}{n^{k}},
-	\] where $A$ is a randomized polynomial-time adversary.
-	The probability is taken over  $x \in U_n$ and over the randomness used by  $A$.
-	See \Cref{fig:hardcore_predicate}.
-\begin{figure}[H]
-	\centering
-\begin{tikzpicture}[>=Stealth, node distance=3cm, thick]
-    \node (x) at (0,0) {$x$};
-    \node (fx) at (3,0) {$f(x)$};
-    \node (bx) at (0,-2) {$B(x)$};
-    \draw[->, green] (x) -- (fx);
-    \draw[->, green] (x) -- (bx);
-    \draw[<-, dashed, red] (bx) -- (fx);
-\end{tikzpicture}
-	\caption{From $x$ we can obtain both  $f(x)$ and $B(x)$, but from  $f(x)$ we cannot calculate  $B(x)$.}
-	\label{fig:hardcore_predicate}
-\end{figure}
+    A family of polynomial-time computable functions $B_n \colon \{0, 1\}^n \to \{0, 1\}$ is a \emph{hardcore predicate} for a function $f_n \colon \{0, 1\}^n \to \{0, 1\}^s$ if no adversary can guess $B_n(x)$ given $f_n(x)$ with probability that is non-negligibly better than $\frac{1}{2}$:
+    \[
+        \forall k \; \forall A \; \exists N \; \forall n > N \; \Pr[A(f_n(x)) = B_n(x)] < \frac{1}{2} + \frac{1}{n^{k}},
+    \]
+    where $A$ is a randomized polynomial-time adversary.
+    The probability is taken over $x \in U_n$ and the randomness used by $A$.
+    See \Cref{fig:hardcore_predicate}.
+    
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}[>=Stealth, node distance=3cm, thick]
+            \node (x) at (0,0) {$x$};
+            \node (fx) at (3,0) {$f(x)$};
+            \node (bx) at (0,-2) {$B(x)$};
+            \draw[->, green] (x) -- (fx);
+            \draw[->, green] (x) -- (bx);
+            \draw[<-, dashed, red] (bx) -- (fx);
+        \end{tikzpicture}
+        \caption{From $x$, we can obtain both $f(x)$ and $B(x)$, but from $f(x)$, we cannot compute $B(x)$.}
+        \label{fig:hardcore_predicate}
+    \end{figure}
 \end{definition}
 
 \begin{theorem}[Oded Goldreich, Leonid Levin] \label{thm:goldreich_levin}
-  If $f$ is a strongly one-way function, then  $\tilde f(x, r) = (f(x), r)$ is a strongly one-way function and  $B(x, r) = x_1 r_1 \oplus x_2r_2 \oplus \dots$ is its hardcore predicate (here $r$ is some additional bits, where $|r| = |x|$).
+    If $f$ is a strongly one-way function, then the function $\tilde{f}(x, r) = (f(x), r)$ is also a strongly one-way function, and $B(x, r) = x_1 r_1 \oplus x_2 r_2 \oplus \dots$ is its hardcore predicate (where $r$ represents additional bits with $|r| = |x|$).
 \end{theorem}
+
 \begin{proof}
-  delayed.
+    The proof is postponed; see \Cref{proof:goldreich_levin}.
 \end{proof}
+
 \begin{exercise}
-  The construction works for trapdoor permutations families as well.
-  Formulate and prove it.
+    The construction above also applies to families of trapdoor permutations.
+    Formulate and prove this result.
 \end{exercise}
 
+\begin{problem}
+    Note that the theorem does not claim the existence of a hardcore predicate for $f$ alone.
+    Is it possible to construct one?
+\end{problem}
 
-\newcommand{\sk}{\textcolor{red}{\text{sk}}}
-\newcommand{\pk}{\textcolor{green}{\text{pk}}}
-\newcommand{\ct}{\textcolor{blue}{\text{code}}}
-\newcommand{\m}{\textcolor{blue}{\text{msg}}}
-\begin{algorithm}
+\begin{algorithm}[Public-Key Encryption Scheme]
+All algorithms below operate in time polynomial in $n$.
+They may be randomized or deterministic.
 
 \begin{itemize}
-    \item $G$ (Alice) generates a pair of keys (public key \pk, secret/private key \sk):
+    \item $G$ (Alice) generates a pair of keys (a public key \pk\ and a secret/private key \sk):
     \[
     G: (1^n, r_g) \mapsto (\pk, \sk),
     \]
     where $r_g \in \{0,1\}^*$ is a random string privately used by $G$.
-    \item $E$ (Bob) encrypts a one-bit message $\m$ using the public key: $\ct \coloneqq E$(\pk, \m).
+    \item $E$ (Bob) encrypts a one-bit message $\m$ using the public key: $\ct \coloneqq E(\pk, \m)$.
     \item $D$ (Alice) decrypts a one-bit message $\m$ using the secret key: $D(\sk, \ct) \approx \m$.
+    
     We assume that the message is decrypted correctly:
     \[
     D(\sk, E(\pk, \m)) = \m,
-    \] or at least
-    \[
-		\Pr[ D(\sk, E(\pk, \m)) = \m ] \geq 0.9.
     \]
-	\item An adversary $A(\pk, \ct)$ (Eve) should not be able to decrypt (without $\sk$) with non-negligible probability, at least
+    or at least that
     \[
-    \Pr\{ A(\pk, E(\pk, \m)) = \m \} < \eps(n).
+        \Pr[ D(\sk, E(\pk, \m)) = \m ] \geq 0.9.
+    \]
+    \item An adversary $A(\pk, \ct)$ (Eve) should not be able to decrypt (without $\sk$) with a non-negligible probability, that is,
+    \[
+        \Pr\{ A(\pk, E(\pk, \m)) = \m \} < \underbrace{\epsilon(n)}_{\text{negligible}}.
     \]
 \end{itemize}
 \end{algorithm}
 
-Assume that $G$ generates a trapdoor permutation family:
-determenistic polynomial-time  $G \colon (1^{n}, r_g) \mapsto (e, d, s)$ (Boolean circuits) s.t.
-\begin{itemize}
-	\item $e \colon \{0,1\}^n \to \{0,1\}^{\xi(n)}$ 
-	\item $d \colon \{0,1\}^{\xi(n)} \to \{0,1\}^n$ 
-	\item $s \colon \{0,1\}^{\sigma(n)} \to \{0,1\}^n$
-\end{itemize}
-such that for all $x \in \Im(s)$ we have  $d(e(x)) = x$.
-Then, if  $B(x)$ is a hardcore predicate, then  $B(x)$ is hard to guess from  $e(x)$.
+We denote a Public-Key Encryption Scheme as \emph{PKES}.
+Additionally, we use the notation \emph{PKCS}.
 
-\todo[inline]{complete}
+\subsection{Public-Key Encryption from Hardcore Predicate}
+One can construct a public-key encryption scheme using either a hardcore predicate or trapdoor permutations.
+Assume that $G$ generates a trapdoor permutation family via a deterministic polynomial-time algorithm $G \colon (1^{n}, r_g) \mapsto (e, d, s)$ (Boolean circuits) such that:
+\begin{itemize}
+    \item $e \colon \{0,1\}^n \to \{0,1\}^{\xi(n)}$,
+    \item $d \colon \{0,1\}^{\xi(n)} \to \{0,1\}^n$,
+    \item $s \colon \{0,1\}^{\sigma(n)} \to \{0,1\}^n$,
+\end{itemize}
+with the property that, for all $x \in \text{Im}(s)$, we have $d(e(x)) = x$.
+Then, if $B(x)$ is a hardcore predicate, $B(x)$ will be difficult to deduce from $e(x)$, where $x$ is some input generated using the sampler (we generate random bits and substitute them into the sampler).
+
+The encryption scheme proceeds as follows:
+\begin{itemize}
+    \item \textbf{Key generation:} The public key is $\pk = (e, s)$, and the secret key is $\sk = d$.
+    \item \textbf{Encryption:} $E(\pk, \m) = (e(s(r)), B(s(r)) \oplus \m)$, where $\m$ is the message bit.
+    \item \textbf{Decryption:} $D(\sk, \ct) = B(d(\ct_1)) \oplus \ct_2$, where $\ct = (\ct_1, \ct_2)$ is the ciphertext.
+\end{itemize}
+
+\begin{lemma}
+    If an adversary $A$ can break this encryption scheme, then it is possible to break the hardcore predicate.
+\end{lemma}
+
+We assume that the adversary, given the public key and an encryption of a message, can decrypt the message.
+
+\begin{proof}
+    Choose $b \in \{0, 1\}$ at random, and let $x = s(r)$ and $y = e(x)$.
+    To break the hardcore predicate, we need to compute $B(x)$ from $y$.
+    Define
+    \[
+        \beta \coloneqq A(\pk, (y, b)) \oplus b.
+    \]
+    Then,
+    \begin{align*}
+        \Pr[\beta = B(x)] &= \Pr[A(\pk, (y, b)) \oplus b = B(x)] \\
+                          &= \Pr[A(\pk, (e(x), b)) \oplus b = B(x)] \\
+                          &= \Pr[A(\pk, E(\pk, B(x) \oplus b)) \oplus b = B(x)] \\
+                          &= \Pr[A(\pk, E(\pk, B(x) \oplus b)) = B(x) \oplus b].
+    \end{align*}
+    Thus, $\beta$ serves as a reliable guess for $B(x)$.
+\end{proof}
+
+\begin{exercise}
+    We've shown that it is difficult to decrypt a random message bit.
+    Is this level of difficulty sufficient for encryption security for large messages?
+\end{exercise}
+
+\subsection{Computational Indistinguishability}
+
+\begin{definition}
+	We say that probability distributions $P$ and $Q$ are \emph{computationally indistinguishable} if, for any integer $k$ and any adversary $A$ (typically a polynomial-time algorithm) which outputs 0 or 1,
+	 \[
+		 \left|\Pr_{x \sim P_n} [A(x) = 1] - \Pr_{x \sim Q_n} [A(x) = 1]\right| < \frac{1}{n^{k}}
+	 \] 
+	 for sufficiently large $n$.
+	 Here, $P = \{P_n\}_{n \in \N} $ and $Q = \{Q_n\}_{n \in \N} $ are ensembles of distributions.
+\end{definition}
+
+\begin{definition}
+	A PKCS is \emph{computationally indistinguishable} if, for all messages $(m_0, m_1)$ of polynomial length and all polynomial-time adversaries $A$,
+	\begin{align*}
+		\left|\Pr[A(E(m_0, e, r_e), e, 1^{n}, m_0, m_1) = 1] - \Pr[A(E(m_1, e, r_e), e, 1^{n}, m_0, m_1) = 1]\right| < \varepsilon(n),
+	\end{align*}
+	where the probability is taken over $r_g$, $r_e$, and the randomness used by $A$.
+\end{definition}
+
+\begin{theorem}
+	For the 1-bit PKCS constructed, for any adversary $A$:
+	 \[
+		 \Pr[A(e(\m, r_e), 1^{n}, e) = \m] < \frac{1}{2} + \varepsilon(n),
+	 \] 
+	where $G(1^{n}, r_g) = (e, d)$, and $\Pr$ is taken over all random variables, including $\m$.
+\end{theorem}
+
+\begin{proof}
+	This follows directly from \Cref{thm:goldreich_levin}.
+\end{proof}
+
+\begin{definition}
+	A 1-bit PKCS is \emph{computationally indistinguishable} if, for all adversaries $A$,
+	 \[
+		 \left|\Pr[A(e(1, r_e), 1^{n}, e) = 1] - \Pr[A(e(0, r_e), 1^{n}, e) = 1]\right| < \varepsilon(n),
+	 \] 
+	where $G(1^{n}, r_g) = (e, d)$, and the probability is taken over all random variables, excluding $\m$.
+\end{definition}
+
+\begin{exercise}
+	Is our PKCS computationally indistinguishable?
+\end{exercise}
+
+\subsection{Public-Key Encryption for Arbitrary-Length Messages}
+
+Consider a naive approach.
+Define $E^*(b_1b_2\ldots) = (E(b_1), E(b_2), \ldots)$ using the same key pair.
+
+\begin{lemma}
+	If there exists an adversary $A^*$ for $E^*$, then one can break the original 1-bit cryptosystem.
+\end{lemma}
+
+\begin{proof}
+	Assume we are given $E(0)$ and $E(1)$ as two codewords, $\ct_a$ and $\ct_b$, and we need to distinguish between them.
+	If $A^*$ can distinguish between some two messages $m_0 = s_1 \ldots s_p$ and $m_1 = t_1 \ldots t_p$, then we proceed as follows:
+	\begin{align*}
+		\frac{1}{n^{k}} < &\left|\Pr[A^*(E(s_1s_2\ldots s_{p-1}s_p)) = 1] - \Pr[A^*(E(t_1t_2\ldots t_{p-1}t_p)) = 1]\right| \leq \\
+						  &\left| \Pr[A^*(E(s_1s_2\ldots s_{p - 1} s_p))] - \Pr[A^*(E(s_1 s_2 \ldots s_{p - 1} t_p))] \right| + \\
+						  +&\left| \Pr[A^*(E(s_1s_2\ldots s_{p - 1} t_p))] - \Pr[A^*(E(s_1 s_2 \ldots s_{p - 2} t_{p - 1} t_p))] \right| + \\
+						  &\ldots + \\
+						  +&\left| \Pr[A^*(E(s_1t_2\ldots t_{p - 1} t_p))] - \Pr[A^*(E(t_1 t_2 \ldots t_{p - 1} t_p))] \right|.
+	\end{align*}
+	Thus, there exists some pair with a substantial difference:
+	\[
+		\Pr[A^*(E(s_1s_2\ldots s_{i_*} t_{i_* + 1}\ldots t_p)) = 1] - \Pr[A^*(E(s_1s_2\ldots s_{i_* - 1} t_{i_*} \ldots t_p)) = 1] > \frac{1}{n^{k'}}.
+	\] 
+	Since we do not know the value of $i_*$, we apply the following strategy.
+	Take a random index $i$, and substitute $\ct_a$ for $s_{i}$ and $\ct_b$ for $t_{i}$, while assigning other bits at random.
+	Thus, the overall success probability is at least:
+	\[
+		\Pr[i = i_*] \cdot \frac{1}{n^{k'}}.
+	\] 
+	Since $\Pr[i = i_*] = \frac{1}{p}$ and $p$ is polynomial, this probability is non-negligible.
+\end{proof}
+
+Another approach to defining security is through \emph{semantic security}.
+In this setting, rather than decrypting a message, the adversary attempts to compute some function of it.
+For example, if a large document is sent, an adversary may try to extract specific crucial data from it.
+Moreover, the adversary might possess some partial information about the message as a hint.
+Additionally, the message itself is likely not an arbitrary string but a meaningful text, possibly generated by some probability distribution.
+
+\begin{definition}
+	A PKCS is \emph{semantically secure} if, for any function $f$ (which the adversary aims to compute), any hint function $h$, any adversary $A$, and any message generator $M$, the following holds.
+	Let $\tilde{A}$ be an adversary that tries to compute some function of the message without the code.
+	We require that the two probabilities be close:
+	 \[
+		 \Pr[A(E(e, m), e, h(m)) = f(m)] \le  \Pr[\tilde{A}(e, h(m)) = f(m)] + \varepsilon(n),
+	 \] 
+	 where $h, f \in \fP$.
+\end{definition}
+Here, for $E$ we denote the encryption algorithm, and $e$ is the public code.
+
+\begin{theorem}
+	Semantic security $\iff$ computational indistinguishability.
+\end{theorem}
+
+\begin{proof}
+	Proof delayed.
+\end{proof}
+
+\subsubsection{More efficient PKCS}
+
+For short denote $r$ as  $s(r)$ (so we assume that random bits given in distribution of $s$).
+Let $E^*(b_1 b_2 \ldots) = (E(b_1), E(b_2), \ldots)$, then it has a separate codeword for each bit, i.e.
+\[
+	E^*(b_1 b_2 \ldots) = ((\underbrace{e(r_1)}_{\approx n \text{ bits }}, B(r_1) \oplus b_1), (\underbrace{e(r_2)}_{\approx n \text{ bits }}, B(r_2) \oplus b_2), \ldots)
+.\] 
+We improve it to:
+\[
+	E^{* *}(b_1 \ldots b_m, e, r) = (e^{m}(r), B(r) \oplus b_1, B(e(r)) \oplus b_2, \ldots, B(e^{m - 1}(r)) \oplus b_m)
+.\] 
+Later we will see that these codewords are indistinguishable from codewords of random message.
