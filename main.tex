@@ -130,8 +130,12 @@
 
 \newcommand{\sk}{\textcolor{red}{\text{sk}}}
 \newcommand{\pk}{\textcolor{green}{\text{pk}}}
-\newcommand{\ct}{\textcolor{brown}{\text{code}}}
-\newcommand{\m}{\textcolor{blue}{\text{msg}}}
+\newcommand{\code}{\textcolor{brown}{\text{code}}}
+\newcommand{\msg}{\textcolor{blue}{\text{msg}}}
+\newcommand{\sign}{\textcolor{purple}{\text{sign}}}
+
+\newcommand\hcancel[2][black]{\setbox0=\hbox{$#2$}%
+\rlap{\raisebox{.45\ht0}{\textcolor{#1}{\rule{\wd0}{1.3pt}}}}#2}
 
 
 \usepackage[color=red!20, textwidth=25mm, colorinlistoftodos]{todonotes}
@@ -159,6 +163,7 @@
     \import{sections/}{03.tex}
     \import{sections/}{04.tex}
     \import{sections/}{05.tex}
+    \import{sections/}{06.tex}
 
 \end{document}
 

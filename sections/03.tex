@@ -16,7 +16,7 @@ This question introduces the concept of \emph{hardcore predicates}.
         \forall k \; \forall A \; \exists N \; \forall n > N \; \Pr[A(f_n(x)) = B_n(x)] < \frac{1}{2} + \frac{1}{n^{k}},
     \]
     where $A$ is a randomized polynomial-time adversary.
-    The probability is taken over $x \in U_n$ and the randomness used by $A$.
+    The probability is taken over $x \gets U_n$ and the randomness used by $A$.
     See \Cref{fig:hardcore_predicate}.
     
     \begin{figure}[H]
@@ -62,20 +62,20 @@ They may be randomized or deterministic.
     G: (1^n, r_g) \mapsto (\pk, \sk),
     \]
     where $r_g \in \{0,1\}^*$ is a random string privately used by $G$.
-    \item $E$ (Bob) encrypts a one-bit message $\m$ using the public key: $\ct \coloneqq E(\pk, \m)$.
-    \item $D$ (Alice) decrypts a one-bit message $\m$ using the secret key: $D(\sk, \ct) \approx \m$.
+    \item $E$ (Bob) encrypts a one-bit message $\msg$ using the public key: $\code \coloneqq E(\pk, \msg)$.
+    \item $D$ (Alice) decrypts a one-bit message $\msg$ using the secret key: $D(\sk, \code) \approx \msg$.
     
     We assume that the message is decrypted correctly:
     \[
-    D(\sk, E(\pk, \m)) = \m,
+    D(\sk, E(\pk, \msg)) = \msg,
     \]
     or at least that
     \[
-        \Pr[ D(\sk, E(\pk, \m)) = \m ] \geq 0.9.
+        \Pr[ D(\sk, E(\pk, \msg)) = \msg ] \geq 0.9.
     \]
-    \item An adversary $A(\pk, \ct)$ (Eve) should not be able to decrypt (without $\sk$) with a non-negligible probability, that is,
+    \item An adversary $A(\pk, \code)$ (Eve) should not be able to decrypt (without $\sk$) with a non-negligible probability, that is,
     \[
-        \Pr\{ A(\pk, E(\pk, \m)) = \m \} < \underbrace{\epsilon(n)}_{\text{negligible}}.
+        \Pr\{ A(\pk, E(\pk, \msg)) = \msg \} < \underbrace{\varepsilon(n)}_{\text{negligible}}.
     \]
 \end{itemize}
 \end{algorithm}
@@ -97,8 +97,8 @@ Then, if $B(x)$ is a hardcore predicate, $B(x)$ will be difficult to deduce from
 The encryption scheme proceeds as follows:
 \begin{itemize}
     \item \textbf{Key generation:} The public key is $\pk = (e, s)$, and the secret key is $\sk = d$.
-    \item \textbf{Encryption:} $E(\pk, \m) = (e(s(r)), B(s(r)) \oplus \m)$, where $\m$ is the message bit.
-    \item \textbf{Decryption:} $D(\sk, \ct) = B(d(\ct_1)) \oplus \ct_2$, where $\ct = (\ct_1, \ct_2)$ is the ciphertext.
+    \item \textbf{Encryption:} $E(\pk, \msg) = (e(s(r)), B(s(r)) \oplus \msg)$, where $\msg$ is the message bit.
+    \item \textbf{Decryption:} $D(\sk, \code) = B(d(\code_1)) \oplus \code_2$, where $\code = (\code_1, \code_2)$ is the ciphertext.
 \end{itemize}
 
 \begin{lemma}
@@ -151,9 +151,9 @@ We assume that the adversary, given the public key and an encryption of a messag
 \begin{theorem}
 	For the 1-bit PKCS constructed, for any adversary $A$:
 	 \[
-		 \Pr[A(e(\m, r_e), 1^{n}, e) = \m] < \frac{1}{2} + \varepsilon(n),
+		 \Pr[A(e(\msg, r_e), 1^{n}, e) = \msg] < \frac{1}{2} + \varepsilon(n),
 	 \] 
-	where $G(1^{n}, r_g) = (e, d)$, and $\Pr$ is taken over all random variables, including $\m$.
+	where $G(1^{n}, r_g) = (e, d)$, and $\Pr$ is taken over all random variables, including $\msg$.
 \end{theorem}
 
 \begin{proof}
@@ -165,7 +165,7 @@ We assume that the adversary, given the public key and an encryption of a messag
 	 \[
 		 \left|\Pr[A(e(1, r_e), 1^{n}, e) = 1] - \Pr[A(e(0, r_e), 1^{n}, e) = 1]\right| < \varepsilon(n),
 	 \] 
-	where $G(1^{n}, r_g) = (e, d)$, and the probability is taken over all random variables, excluding $\m$.
+	where $G(1^{n}, r_g) = (e, d)$, and the probability is taken over all random variables, excluding $\msg$.
 \end{definition}
 
 \begin{exercise}
@@ -182,7 +182,7 @@ Define $E^*(b_1b_2\ldots) = (E(b_1), E(b_2), \ldots)$ using the same key pair.
 \end{lemma}
 
 \begin{proof}
-	Assume we are given $E(0)$ and $E(1)$ as two codewords, $\ct_a$ and $\ct_b$, and we need to distinguish between them.
+	Assume we are given $E(0)$ and $E(1)$ as two codewords, $\code_a$ and $\code_b$, and we need to distinguish between them.
 	If $A^*$ can distinguish between some two messages $m_0 = s_1 \ldots s_p$ and $m_1 = t_1 \ldots t_p$, then we proceed as follows:
 	\begin{align*}
 		\frac{1}{n^{k}} < &\left|\Pr[A^*(E(s_1s_2\ldots s_{p-1}s_p)) = 1] - \Pr[A^*(E(t_1t_2\ldots t_{p-1}t_p)) = 1]\right| \leq \\
@@ -196,7 +196,7 @@ Define $E^*(b_1b_2\ldots) = (E(b_1), E(b_2), \ldots)$ using the same key pair.
 		\Pr[A^*(E(s_1s_2\ldots s_{i_*} t_{i_* + 1}\ldots t_p)) = 1] - \Pr[A^*(E(s_1s_2\ldots s_{i_* - 1} t_{i_*} \ldots t_p)) = 1] > \frac{1}{n^{k'}}.
 	\] 
 	Since we do not know the value of $i_*$, we apply the following strategy.
-	Take a random index $i$, and substitute $\ct_a$ for $s_{i}$ and $\ct_b$ for $t_{i}$, while assigning other bits at random.
+	Take a random index $i$, and substitute $\code_a$ for $s_{i}$ and $\code_b$ for $t_{i}$, while assigning other bits at random.
 	Thus, the overall success probability is at least:
 	\[
 		\Pr[i = i_*] \cdot \frac{1}{n^{k'}}.
@@ -283,7 +283,7 @@ Here, for $E$ we denote the encryption algorithm, and $e$ is the public code.
 
 		Now, we construct a new adversary $\tilde{A}_s(h_*)$, where $h_* = h(m_0)$ (hardcoded):
 		\begin{itemize}
-			\item Choose a random $m \in M_S$,
+			\item Choose a random $m \gets M_S$,
 			\item Encrypt $m$ and run $A_s(E(m, \ldots), h_*)$.
 		\end{itemize}
 		Therefore, the success probability of $\tilde{A}_s$ is exactly

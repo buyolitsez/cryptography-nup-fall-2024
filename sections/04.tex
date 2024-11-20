@@ -3,6 +3,7 @@
 \subsection{Goldreich-Levin Theorem}
 \goldreichlevin*
 \begin{proof}[Proof of \Cref{thm:goldreich_levin}] \label{proof:goldreich_levin}
+	It is easy to see that $\tilde f$ is also a strongly one-way function, since we didn't make it easier to invert.
     Assume we have an adversary that computes $B(x, r) = \langle x, r \rangle \mod 2 = \bigoplus_i x_i r_i$ from $f(x)$ and $r$. 
     Denote this adversary as $\tilde{B}(f(x), r)$.
     We will attempt to invert $f$.
@@ -67,11 +68,11 @@
 	\end{proof}
 
 	\begin{lemma}
-		$r^J \in U_n$, and $r^J$ and $r^K$ are independent for $J \neq K$.
+		$r^J \gets U_n$, and $r^J$ and $r^K$ are independent for $J \neq K$.
 	\end{lemma}
 
 	\begin{proof}
-		Since each $r^{j} \in  U_n$ it is clear that $r^{J} \in  U_n$.
+		Since each $r^{j} \gets  U_n$ it is clear that $r^{J} \gets  U_n$.
 		If $K \subseteq J$, then
 		 \begin{align*}
 			 \Pr[r^J = t, r^K = t'] &= \Pr[r^{J \setminus K} = t \oplus t', r^{K} = t'] \\
@@ -106,7 +107,7 @@
 		Given pairwise independence, we have $\Var(\sum_J \xi_i^J) = m \cdot \Var(\xi_i^J) \leq m$ (since the variance of Boolean random variable is no more than 1).
 		Applying Chebyshev's inequality (in the form that $\Pr[\alpha < \E \alpha - \Delta] < \Var(\alpha) / \Delta^2$), we obtain:
 		\[
-			\Pr\left[\sum_J \xi_i^J < m\left(\frac{1}{2} + \frac{\delta}{2}\right) - \frac{m\delta}{2}\right] < \frac{4 \Var(\xi_i^J)}{m^2 \delta^2} \leq \frac{4}{m \delta^2} \leq \frac{4}{n^2} \leq \frac{1}{2n}.
+			\Pr\left[\sum_J \xi_i^J < m\left(\frac{1}{2} + \frac{\delta}{2}\right) - \frac{m\delta}{2}\right] < \frac{4m \Var(\xi_i^J)}{m^2 \delta^2} \leq \frac{4}{m \delta^2} \leq \frac{4}{n^2} \leq \frac{1}{2n}.
 		\] 
 	\end{proof}
 
@@ -182,7 +183,7 @@ In the proof below, $U$ denotes a uniform distribution of strings of fixed lengt
   \] 
   Without loss of generality, we assume that $\frac{1}{l^{k}} \le \gamma - \nu = \alpha - \frac{\alpha + \beta}{2} = \frac{\alpha - \beta}{2}$ (otherwise, we simply flip all outputs of $A$).
   
-  Our new adversary $A'$ computes $B(x)$ from $f(x)$: it picks a random bit $b \in U_1$ and, if $A(f(x) \circ b) = 1$, outputs $b$, otherwise it outputs $\overline{b}$.
+  Our new adversary $A'$ computes $B(x)$ from $f(x)$: it picks a random bit $b \gets U_1$ and, if $A(f(x) \circ b) = 1$, outputs $b$, otherwise it outputs $\overline{b}$.
   
   The probability of success is:
   \begin{align*}
@@ -192,7 +193,7 @@ In the proof below, $U$ denotes a uniform distribution of strings of fixed lengt
   \end{align*}
   Thus, we can break $B$.
 
-  Now, suppose that an adversary $A$ can distinguish between $G_i(U)$ and $G_{i + 1}(U)$.
+  Now, suppose that an adversary $A$ can distinguish between $G_i(U)$ and $G_{i + 1}(U)$. \todo{it is not correct, fix}
   We will show that this implies an ability to distinguish between $U$ and $G_1(U)$.
   
   Let $x$ and $z$ be random variables (uniformly distributed) such that $|z| = |x| + 1$.
@@ -201,5 +202,5 @@ In the proof below, $U$ denotes a uniform distribution of strings of fixed lengt
 	   G_{i + 1}(x) &= g^{i + 1}(x) \circ B(x) \circ B(g(x)) \circ \dots \circ B(g^{i}(x)),\\
 	   G_{i}(z) &= g^{i}(z) \circ B(z) \circ B(g(z)) \circ \dots \circ B(g^{i - 1}(z)).
    \end{align*}
-  Hence, $A$ distinguishes between $g^{i + 1}(x) \circ B(x)$ and $g^{i}(z) \in U$.
+  Hence, $A$ distinguishes between $g^{i + 1}(x) \circ B(x)$ and $g^{i}(z) \gets U$.
 \end{proof}

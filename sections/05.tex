@@ -17,21 +17,21 @@
 \subsection{Wrong Construction}
 
 Assume we have some "secret book" which is a PRG and we will use bits from it to encrypt messages.
-We have publicly known PRП $G$ and some symmetric key  $\sk$:
+We have publicly known PRG $G$ and some symmetric key  $\sk$:
  \[
-E(\sk, \m) = \m \oplus G(\sk) = (b_1 \oplus G_1(\sk)) \oplus \ldots \oplus (b_p \oplus G_p(\sk))
+E(\sk, \msg) = \msg \oplus G(\sk) = (b_1 \oplus G_1(\sk)) \circ \ldots \circ (b_p \oplus G_p(\sk))
 .\] 
 Where $b_i, G_i$ are consequent bits of the message and the PRG, respectively.
 
 An attack:
  \[
-	 \m = E(\sk, 0^{p}) \oplus E(\sk, \m)
+	 \msg = E(\sk, 0^{p}) \oplus E(\sk, \msg)
 .\] 
 So, if we somehow learned $E(\sk, 0^{p})$ we can decrypt anything.
 And even worse, one can decrypt it without knowing $E(\sk, 0^{p})$.
-Assume two messages $\m \neq \m'$, then
+Assume two messages $\msg \neq \msg'$, then
 \[
-\sk_i = (E_i(\sk, \m) \oplus E_i(\sk, \m')) \oplus (\m_i \oplus \m'_i)
+\sk_i = (E_i(\sk, \msg) \oplus E_i(\sk, \msg')) \oplus (\msg_i \oplus \msg'_i)
 .\] \todo{fix}
 \begin{exercise}
 	Prove formally that this attack is successful: this system is not semantically secure for multiple messages.
@@ -181,14 +181,14 @@ A standard definition says that $Z$ generates an index, and  $f_{\zeta}(x)$ is c
 \begin{itemize}
 	\item To encode an $n$-bit message, define a "proto-scheme":
 		 \[
-		E(\zeta, \m, r_E) = (\zeta(r_E) \oplus \m, r_E)
+		E(\zeta, \msg, r_E) = (\zeta(r_E) \oplus \msg, r_E)
 		,\] 
 		where $\zeta \gets Z(1^{n})$ serves as a key and $r_E \gets U$ is our randomness ($r_E$ is independent with $\zeta$).
 
 	\item To encode messages of arbitrary length, cut them into pieces:
 		\begin{align*}
-			E'(\zeta, \m, r_E) = (|\m|, &E(\zeta, \m[1\ldots n], r_E[1 \ldots n]), \\
-										&E(\zeta, \m[n + 1 \ldots 2n], r_E[n + 1 \ldots 2n]), \ldots)
+			E'(\zeta, \msg, r_E) = (|\msg|, &E(\zeta, \msg[1\ldots n], r_E[1 \ldots n]), \\
+										&E(\zeta, \msg[n + 1 \ldots 2n], r_E[n + 1 \ldots 2n]), \ldots)
 		.\end{align*}
 		It is worth mentioning, that we use the same symmetric key, but different randomness for each piece.
 \end{itemize}
@@ -199,7 +199,7 @@ A standard definition says that $Z$ generates an index, and  $f_{\zeta}(x)$ is c
 	It is enough to prove that the proto-scheme is secure in multiple-message setting.
 	If an adversary distinguishes sequences
 	\[
-		\{(\zeta(r_i) \oplus \m^{(i)}, r_i)\}_{i} \quad \text{from} \quad \{(\zeta(r_i') \oplus \underbrace{\rho^{(i)}}_{\text{random}}, r_i')\}_{i} 
+		\{(\zeta(r_i) \oplus \msg^{(i)}, r_i)\}_{i} \quad \text{from} \quad \{(\zeta(r_i') \oplus \underbrace{\rho^{(i)}}_{\text{random}}, r_i')\}_{i} 
 	.\] 
 	Then, we can distinguish either
 	\[
@@ -207,7 +207,7 @@ A standard definition says that $Z$ generates an index, and  $f_{\zeta}(x)$ is c
 	.\] Where $R$ is a truly random function.
 	Or
 	\[
-		\{(R(r_i) \oplus \m^{(i)}, r_i)\}_{i} \quad \text{from} \quad \{(R(r_i') \oplus \rho^{(i)}, r_i')\}_{i} 
+		\{(R(r_i) \oplus \msg^{(i)}, r_i)\}_{i} \quad \text{from} \quad \{(R(r_i') \oplus \rho^{(i)}, r_i')\}_{i} 
 	.\] 
 	But the first one is impossible since $\zeta$ is pseudo random function.
 	And the second one is impossible since $R$ is truly random.

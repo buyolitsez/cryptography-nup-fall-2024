@@ -6,7 +6,7 @@ Let $\fP$ denote the class of functions that can be computed in~polynomial~time.
 Similarly, let $\FP$ denote the class of problems for which a~solution can be found in~polynomial~time.
 
 \begin{definition}
-	A \emph{one-way function} is an injective function that can be efficiently computed (in~polynomial~time), but whose inverse cannot be efficiently computed (in~polynomial~time).
+	A \emph{one-way function} (owf) is an injective function that can be efficiently computed (in~polynomial~time), but whose inverse cannot be efficiently computed (in~polynomial~time).
 \end{definition}
 
 \begin{theorem}
@@ -285,16 +285,17 @@ Our one-way functions will typically possess the following properties:
 We now define a function that can be inverted by its creator, yet remains infeasible to invert for others.
 
 \begin{definition}
-    A \emph{trapdoor function family (TDFF)} is a collection of polynomial-time functions $e_n$ and $d_n$ such that $d_n(e_n(x)) = x$, and for any adversary $A$,
+    A \emph{trapdoor function family (tdff)} is a collection of polynomial-time functions $e_n$ and $d_n$ such that $d_n(e_n(x)) = x$, and for any adversary $A$,
     \[
         \Pr[A \text{ inverts } e_n \text{ on } x] \text{ is negligible}.
     \]
 \end{definition}
+By tdpf we denote trapdoor permutation family.
 
 The challenge lies in the fact that there is no uniform algorithm $D(n, x)$ for computing $d_n$, as $d_n$ is not invertible in polynomial time. A more precise definition follows.
 
 \begin{definition}
-    A TDFF is a deterministic polynomial-time algorithm $G \colon (1^n, r_g) \to (e, d, s)$ that generates Boolean circuits with the following properties:
+    A tdff is a deterministic polynomial-time algorithm $G \colon (1^n, r_g) \to (e, d, s)$ that generates Boolean circuits with the following properties:
     \begin{itemize}
         \item $e \colon \{0, 1\}^n \to \{0, 1\}^{s(n)}$ (the encryptor),
         \item $d \colon \{0, 1\}^{s(n)} \to \{0, 1\}^n$ (the decryptor),
@@ -314,14 +315,14 @@ However, without knowledge of these bits, inversion becomes computationally chal
 \begin{example}[RSA, Rivest-Shamir-Adleman]
     Let $p, q \in \mathbb{P}$ (secret).
     Define $N = p \cdot q$ (publicly known).
-    Choose $\epsilon, \delta$ from $\mathbb{Z}_N$ such that $\epsilon \cdot \delta = 1 \mod (p - 1)(q - 1)$ (secret).
-    Then define $s(x) = x$, $e(x) = x^{\epsilon} \mod N$, and $d(x) = x^{\delta} \mod N$.
+    Choose $\varepsilon, \delta$ from $\mathbb{Z}_N$ such that $\varepsilon \cdot \delta = 1 \mod (p - 1)(q - 1)$ (secret).
+    Then define $s(x) = x$, $e(x) = x^{\varepsilon} \mod N$, and $d(x) = x^{\delta} \mod N$.
 \end{example}
 
 \begin{proof}
     We show that this construction works:
     \[
-        d(e(x)) = x^{\epsilon \delta} \mod N = x \mod N,
+        d(e(x)) = x^{\varepsilon \delta} \mod N = x \mod N,
     \]
     by Fermat's Little Theorem.
 \end{proof}
