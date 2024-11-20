@@ -88,7 +88,7 @@ In practice, one may desire to invert their own function while preventing others
 This leads us to the next definition.
 
 \begin{definition}
-    A \emph{one-way function family (OWFF)} is a deterministic polynomial-time algorithm $G \colon (1^n, r_g) \to (s_n, e_n)$ that generates two Boolean circuits:
+    A \emph{one-way function family (owff)} is a deterministic polynomial-time algorithm $G \colon (1^n, r_g) \to (s_n, e_n)$ that generates two Boolean circuits:
     \begin{itemize}
         \item $e_n \colon \{0, 1\}^n \to \{0, 1\}^{m(n)}$ (the function itself),
         \item $s_n \colon \{0, 1\}^{\sigma(n)} \to \{0, 1\}^n$ (a sampler, which takes random bits and produces a specified distribution).
