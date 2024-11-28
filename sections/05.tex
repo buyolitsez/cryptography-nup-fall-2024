@@ -76,10 +76,8 @@ Small $\zeta$ serves as an exponentially large "code book".
 We use  $\zeta$ and  $f_{\zeta}$ interchangeably.
 \end{remark}
 
-\begin{lemma}
+\begin{scheme}
 	One can construct a prff using $2n$-PRG  $G \colon \{0, 1\}^{n} \to  \{0, 1\}^{2n}$.
-\end{lemma}
-\begin{proof}
 	Split $G$'s output into two $n$-bit parts $G(x) = G_0(x) \circ G_1(x)$.
 	Then, take $s \gets U_n$ and compute
 	\[
@@ -123,6 +121,8 @@ We use  $\zeta$ and  $f_{\zeta}$ interchangeably.
 	\end{figure}
 	See \Cref{fig:tree_encodings}.
 	I.e. each path from root to a leaf is some encoding of a message.
+\end{scheme}
+\begin{proof}
 	If it isn't a prff, hence there is an adversary $D$ that distinguish 
 	 \[
 		 \zeta_s(b_1 b_2 \ldots b_n) = G_{b_n}(G_{b_{n - 1}}(\ldots (G_{b_1}(s)) \ldots)) \quad \text{from} \quad R(b_1 \ldots b_n)
@@ -179,6 +179,7 @@ A standard definition says that $Z$ generates an index, and  $f_{\zeta}(x)$ is c
 
 \subsection{Symmetric-Key Encryption Scheme Based on prff}
 
+\begin{scheme}
 \begin{itemize}
 	\item To encode an $n$-bit message, define a "proto-scheme":
 		 \[
@@ -193,6 +194,7 @@ A standard definition says that $Z$ generates an index, and  $f_{\zeta}(x)$ is c
 		.\end{align*}
 		It is worth mentioning, that we use the same symmetric key, but different randomness for each piece.
 \end{itemize}
+\end{scheme}
 \begin{lemma}
 	This scheme is secure.
 \end{lemma}

@@ -79,44 +79,15 @@
 \newtheorem*{exercise}{Exercise}
 \newtheorem*{problem}{Problem}
 \newtheorem{suggestion}{Suggestion}
+\newtheorem{scheme}{Scheme}
 
 \numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
 \numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
 \numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
 
-% some aliases
-\newcommand{\R}{\ensuremath \mathbb{R}}
-\newcommand{\Q}{\ensuremath \mathbb{Q}}
-\newcommand{\CC}{\ensuremath \mathbb{C}}
-\newcommand{\Z}{\ensuremath \mathbb{Z}}
-\newcommand{\N}{\ensuremath \mathbb{N}}
-\newcommand{\eps}{\ensuremath \varepsilon}
-\newcommand{\then}{\ensuremath \implies}
-\newcommand{\Mid}{\ensuremath \;\middle|\;}
-\newcommand{\Ot}{\widetilde{O}}
 \newcommand{\hw}{{\color{red} Homework}}
 
-% project-local aliases
-\newcommand{\A}{\ensuremath \mathfrak{A}}
-\newcommand{\E}{\ensuremath \mathbb{E}}
-\newcommand{\B}{\ensuremath \mathcal{B}}
-\newcommand{\p}{\ensuremath \mathcal{P}}
-\newcommand{\mua}{\ensuremath \mu^\ast}
-\newcommand{\LL}{\ensuremath \mathcal{L}}
-\newcommand{\lan}{\ensuremath \lambda_n}
-\newcommand{\alan}{\ensuremath \A_{\lan}}
-
-\DeclareMathOperator{\sgn}{sgn}
-\DeclareMathOperator{\Real}{Re}
-\DeclareMathOperator{\Imaginary}{Im}
-\DeclareMathOperator*{\esssup}{ess\,sup}
-\DeclareMathOperator{\Ker}{Ker}
-\DeclareMathOperator{\diam}{diam}
-\DeclareMathOperator{\cc}{CC}
-\DeclareMathOperator{\BPP}{BPP}
-\DeclareMathOperator{\ZPP}{ZPP}
-\DeclareMathOperator{\RP}{RP}
-\DeclareMathOperator{\PP}{P}
+\renewcommand{\P}{\operatorname{P}}
 \DeclareMathOperator{\NP}{NP}
 \renewcommand{\leq}{\leqslant}
 \renewcommand{\geq}{\geqslant}
@@ -133,6 +104,9 @@
 \newcommand{\code}{\textcolor{brown}{\text{code}}}
 \newcommand{\msg}{\textcolor{blue}{\text{msg}}}
 \newcommand{\sign}{\textcolor{purple}{\text{sign}}}
+\newcommand{\key}{\textcolor{green}{\text{key}}}
+\newcommand{\keys}{\textcolor{red}{\text{keys}}}
+\newcommand{\protocol}{\textcolor{pink}{\text{protocol}}}
 
 \newcommand\hcancel[2][black]{\setbox0=\hbox{$#2$}%
 \rlap{\raisebox{.45\ht0}{\textcolor{#1}{\rule{\wd0}{1.3pt}}}}#2}
@@ -164,6 +138,7 @@
     \import{sections/}{04.tex}
     \import{sections/}{05.tex}
     \import{sections/}{06.tex}
+    \import{sections/}{07.tex}
 
 \end{document}
 

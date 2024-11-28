@@ -59,7 +59,7 @@
 		\] 
 		which implies that
 		\[
-			\E_x[1 - S(x)] = 1 - \left(\frac{1}{2} + \delta\right) = \frac{1}{2} - \delta.
+			\mathbb{E}_x[1 - S(x)] = 1 - \left(\frac{1}{2} + \delta\right) = \frac{1}{2} - \delta.
 		\] 
 		Using Markov's inequality, we obtain:
 		\[
@@ -102,10 +102,10 @@
 	\begin{proof}
 		Since for any $x \in  S_n$ we have that probability of a success is at least $\frac{1}{2} + \frac{\delta}{2}$, then it is straightforward to see that
 		\[
-			\E\left[\sum_J \xi_i^J\right] \geq m\left(\frac{1}{2} + \frac{\delta}{2}\right).
+			\mathbb{E}\left[\sum_J \xi_i^J\right] \geq m\left(\frac{1}{2} + \frac{\delta}{2}\right).
 		\]
 		Given pairwise independence, we have $\Var(\sum_J \xi_i^J) = m \cdot \Var(\xi_i^J) \leq m$ (since the variance of Boolean random variable is no more than 1).
-		Applying Chebyshev's inequality (in the form that $\Pr[\alpha < \E \alpha - \Delta] < \Var(\alpha) / \Delta^2$), we obtain:
+		Applying Chebyshev's inequality (in the form that $\Pr[\alpha < \mathbb{E} \alpha - \Delta] < \Var(\alpha) / \Delta^2$), we obtain:
 		\[
 			\Pr\left[\sum_J \xi_i^J < m\left(\frac{1}{2} + \frac{\delta}{2}\right) - \frac{m\delta}{2}\right] < \frac{4m \Var(\xi_i^J)}{m^2 \delta^2} \leq \frac{4}{m \delta^2} \leq \frac{4}{n^2} \leq \frac{1}{2n}.
 		\] 
@@ -138,7 +138,7 @@ All of the exercises below relate to the proof above.
   We say that $G \colon \{0,1\}^l \to \{0,1\}^{f(l)}$ is an $f(l)$-PRG if, for every adversary $A$, the distributions $G(U_l)$ and $U_{f(l)}$ are computationally indistinguishable.
 \end{definition}
 
-If one creates such a generator for $f(l) = 2^{l}$, this implies that all polynomial-time randomized algorithms are contained in $\PP$!
+If one creates such a generator for $f(l) = 2^{l}$, this implies that all polynomial-time randomized algorithms are contained in $\P$!
 
 Recall our public-key encryption scheme:
 \[

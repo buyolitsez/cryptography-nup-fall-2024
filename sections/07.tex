@@ -1,0 +1,168 @@
+%28.11.2024
+
+\section{Bit (Bid) Commitment}
+
+One wants to send everyone an encrypted bit.
+Such that nobody can decrypt it, but after some deadline the bit can be decrypted.
+Such that nobody can fake the value of the bit (even the sender).
+
+Formally, Alice holds a bit and a key.
+She sends the encrypted bid to Bob.
+After some time, Alice sends a key, so everyone can decode the bid and guarantee that Alice initially encoded the exact the same bid.
+
+\subsection{Constuction from owp}
+\begin{definition}[Bit commitment: non-interactive version]
+    Polynomial time $A(1^{n}, \beta) = (\code, \key)$, where $\beta \in \{0, 1\}$.
+    Polynomial time $B:$
+    \begin{itemize}
+        \item $B(\beta, \code, \key) = 1$, if $(\code, \key) \gets A(1^{n}, \beta)$.
+	\item For $\code$ generated this way from $\beta$ and any adversary $\tilde{B}$,
+	    \[
+		\Pr[\tilde{B}(\beta, \code) = 1] < \frac{1}{2} + \varepsilon(n).
+	    \] 
+	\item For any $x$ and $k$ not  generated this way (or generated from $\beta' \neq  \beta$),
+	    \[
+		\Pr[B(\beta, x, k) = 1] < \varepsilon(n).
+	    \] 
+    \end{itemize}
+\end{definition}
+
+\begin{scheme}
+    Construction of Bid commitment.
+    Consider owp $f$, hardcore predicate $B$.
+    Then, $A(1^{n}, \beta)$:
+    \begin{itemize}
+        \item Pick random $r \gets U_n$
+	\item Send $\code = (f(r), B(r) \oplus \beta)$
+	\item $\key = r$
+    \end{itemize}
+    $B(\beta, \code, \key)$:
+    \begin{itemize}
+        \item Let $\code = (y, b)$
+	\item Check $f(\key) = y$ and $b = B(\key) \oplus \beta$.
+    \end{itemize}
+\end{scheme}
+\begin{proof}
+    This scheme is secure.
+\end{proof}
+\begin{proof}
+    If someone can reveal $\beta$, they can also reveal $B(r)$ from $f(r)$, which is a contradiction to the fact that $B$ is a hardcore predicate for $f$.
+    Also, Alice cannot change her opinion, because there is no other key $\key'  \colon f(\key') = y$, since $f$ is a owp.
+\end{proof}
+
+\begin{exercise}
+    What can we use instead of a permutation?
+\end{exercise}
+
+\begin{remark}
+    There are more efficient multi-round protocols.
+\end{remark}
+
+\section{Oblivious transfer}
+
+Alice holds two bids: $\beta_0, \beta_1, \keys$.
+She sends Bob encrypted $\beta_0, \beta_1$.
+Then, Bob asks Alice to open one of those envelops, $i$-th one for $i \in \{0, 1\}$.
+But, Bob does not send $i$ to Alice, just some \textit{request}.
+Then, Alice sends him some $\key$.
+Hence, Bob should be able to decrypt $\beta_i$.
+This should be done in a way such that Alice has no idea, which envelop was opened.
+
+\begin{definition}[(1,2)-OT]
+    (1, 2)-OT scheme is a protocol with poly-time participants $A(\beta_0, \beta_1)$ and $B(i)$, where $\beta_0, \beta_1, i \in \{0, 1\}$ and after the protocol:
+    \begin{itemize}
+        \item $B$ knowns $\beta_i$.
+	\item for any adversary $B'$ (playing instead of $B$) the probability to guess $\beta_{1 - i}$ is $< \frac{1}{2} + \varepsilon(n)$.
+	\item for any adversary $A'$ (playing instead of $A$) the probability to guess $i$ is $< \frac{1}{2} + \varepsilon(n)$.
+    \end{itemize}
+\end{definition}
+(1,2) stands for two players, 1 bit bid.
+
+\begin{definition}[Extended tdpf]
+    Extended tdpf (e, s, s', d), with hardcore predicate $B$ contains an additional sampler $s'$:
+    \begin{itemize}
+        \item $d(s'(r'))$ is hard to compute without $d$ even if we know $r'$,
+	\item $s'(r')$ is distributed similarly to $e(s(r))$ even if we know $d$,
+    \end{itemize}
+\end{definition}
+We will use it in our scheme.
+Consider \emph{semi-honest} participants.
+So, they follow the protocol, but can compute something in addition.
+
+\begin{scheme}
+\begin{enumerate}
+    \item Alice generates $(e, s, s', d), B$
+    \item Alice sends $(e, s, s'), B$
+    \item Bob generater $r, r'$ at random and then sends $a_i = e(s(r))$ and $a_{1 - i}=s'(r')$.
+    \item Alice sends $c_0 = \beta_0 \oplus B(d(a_0))$ and $c_1 = \beta_1 \oplus B(d(a_1))$.
+    \item Bob computes $\beta_i = B(s(r)) \oplus c_i$.
+\end{enumerate}
+\end{scheme}
+\begin{lemma}
+    This scheme is secure.
+\end{lemma}
+\begin{proof}
+    Alice cannot distinguish between $a_0$ and $a_1$, since they have the same distribution.
+    Also, Bob cannot find $\beta_{1 - i}$, since $d(s'(r'))$ is hard to compute without $d$.
+    We need the hardcore predicate to make $d(a_0), d(a_1)$ to be a single bit.
+\end{proof}
+
+\section{Secure Distributed Computation}
+
+Alice holds $a$, Bob holds $b$.
+And some fixed function $f$ is given.
+So, basically they holds a part of the message.
+They communicate and at the end compute $f(a, b)$, both.
+But, they should not be able to learn about the input of the other party.
+But $f(a, b)$ could reveal some information of the other part, so Alice should not be able to reveal more than the information containing in the $a, f(a, b)$.
+Same for $Bob$.
+
+\begin{definition}[Secure Distributed Function Evaluation]
+    Given poly-time function $f$ with half arguments given to $A$ and half to $B$:
+    \[
+    f(a_1, \ldots, a_m, b_1, \ldots, b_m).
+    \] 
+    Alice and Bob need to compute the result.
+    For any adversary $A'$, any function $g$ and oblivious adversary $\tilde{A}$:
+    \[
+	\Pr[A'(\vec a, \protocol) \text{ computes } g(\vec a, \vec b)] \le \Pr[\tilde{A}(\vec a, f(\vec a, \vec b)) \text{ computes } g(\vec a, \vec b)] + \varepsilon(n).
+    \] 
+    And the same for Bob.
+\end{definition}
+
+Assuming that parties are semi-honest.
+\begin{scheme}[Yao's scheme]
+    Represent $f$ as a Boolean circuit.
+    \begin{itemize}
+	\item Pick symmetric keys $u_0, u_1, v_0, v_1, w_0, w_1$, encrypt the otputs, send:
+        \item Alice encrypts each gate of the circuit: input and output bits are encoded.
+	Each line of the truth table of each gate is representated by three bits $u, v, w$, means that if on the left wire $u$ comes, one right wire $v$, then the result is $w$.
+	Alice encodes $E_i(E_v(w))$ for each of four lines and then send shuffled result for each gate!
+    
+	Example:
+	\[
+\begin{array}{c@{\hspace{0.5cm}}c@{\hspace{0.5cm}}|c@{\hspace{1cm}}}
+0 & 0 & 1\\
+0 & 1 & 0\\
+1 & 0 & 1\\
+1 & 1 & 0\\
+\end{array} \to
+\begin{array}{c@{\hspace{0.5cm}}c@{\hspace{0.5cm}}|c}
+u_0 & v_0 & E_{u_0}\big(E_{v_0}(w_1)\big) \\
+u_0 & v_1 & E_{u_0}\big(E_{v_1}(w_0)\big) \\
+u_1 & v_0 & E_{u_1}\big(E_{v_0}(w_1)\big) \\
+u_1 & v_1 & E_{u_1}\big(E_{v_1}(w_0)\big) \\
+\end{array}
+\textcolor{green}{\text{reshuffle!}}
+	\] 
+\todo[inline]{picture}
+	\item Send specific codewords for the inputs $a_1, \ldots, a_m$.
+	\item Bob has encrypted circuit and the codewords for Alice's inputs.
+	\item Bob gets codewords for his inputs from Alice using OT.
+	\item Bob simulate the circuit (in private) and get the encrypted output.
+	\item Alice decrypts the output (e.g. bit commitment or (1,2)-OT again)
+    \end{itemize}
+    \todo[inline]{finish}
+\end{scheme}
+
+

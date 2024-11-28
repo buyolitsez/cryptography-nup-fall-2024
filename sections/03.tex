@@ -52,7 +52,7 @@ This question introduces the concept of \emph{hardcore predicates}.
     Is it possible to construct one?
 \end{problem}
 
-\begin{algorithm}[Public-Key Encryption Scheme]
+\begin{scheme}[Public-Key Encryption Scheme]
 All algorithms below operate in time polynomial in $n$.
 They may be randomized or deterministic.
 
@@ -78,13 +78,14 @@ They may be randomized or deterministic.
         \Pr\{ A(\pk, E(\pk, \msg)) = \msg \} < \underbrace{\varepsilon(n)}_{\text{negligible}}.
     \]
 \end{itemize}
-\end{algorithm}
+\end{scheme}
 
 We denote a Public-Key Encryption Scheme as \emph{PKES}.
 Additionally, we use the notation \emph{PKCS}.
 
 \subsection{Public-Key Encryption from Hardcore Predicate}
 One can construct a public-key encryption scheme using either a hardcore predicate or trapdoor permutations.
+\begin{scheme}
 Assume that $G$ generates a trapdoor permutation family via a deterministic polynomial-time algorithm $G \colon (1^{n}, r_g) \mapsto (e, d, s)$ (Boolean circuits) such that:
 \begin{itemize}
     \item $e \colon \{0,1\}^n \to \{0,1\}^{\xi(n)}$,
@@ -100,6 +101,7 @@ The encryption scheme proceeds as follows:
     \item \textbf{Encryption:} $E(\pk, \msg) = (e(s(r)), B(s(r)) \oplus \msg)$, where $\msg$ is the message bit.
     \item \textbf{Decryption:} $D(\sk, \code) = B(d(\code_1)) \oplus \code_2$, where $\code = (\code_1, \code_2)$ is the ciphertext.
 \end{itemize}
+\end{scheme}
 
 \begin{lemma}
     If an adversary $A$ can break this encryption scheme, then it is possible to break the hardcore predicate.
@@ -137,7 +139,7 @@ We assume that the adversary, given the public key and an encryption of a messag
 		 \left|\Pr_{x \sim P_n} [A(x) = 1] - \Pr_{x \sim Q_n} [A(x) = 1]\right| < \frac{1}{n^{k}}
 	 \] 
 	 for sufficiently large $n$.
-	 Here, $P = \{P_n\}_{n \in \N} $ and $Q = \{Q_n\}_{n \in \N} $ are ensembles of distributions.
+	 Here, $P = \{P_n\}_{n \in \mathbb{N}} $ and $Q = \{Q_n\}_{n \in \mathbb{N}} $ are ensembles of distributions.
 \end{definition}
 
 \begin{definition}
@@ -251,24 +253,25 @@ Here, for $E$ we denote the encryption algorithm, and $e$ is the public code.
 		q_k(x) &\coloneqq \Pr[A_s(E(e, x), e, h(m_0)) = k], \\
 		f_i &\coloneqq f(m_i).
 	\end{align*}
-	Here, $p_k$ is the probability that $A_s$ decodes $x$ into $k$, while $q_k$ is the probability that $A_s$ decodes into $k$ given a potentially incorrect hint $m_0$.
+	Here, $p_k$ is the probability that $A_s$ decodes $x$ into $k$, while $q_k$ is the probability that $A_s$ decodes into $k$ given a potentially incorrect hint $h(m_0)$.
 
 	\begin{lemma}
-		There exists a pair $m_0, m_1$ such that $f(m_0) \neq f(m_1)$ and 
+		There exists a pair $m_0, m_1$ such that
 		\[
-			p_{f_0}(m_0) - q_{f_0}(m_1) \text{ ~is substantial}.
+			p_{f_0}(m_0) - q_{f_0}(m_1) > \frac{1}{2} + \frac{1}{\poly(n)}.
 		\] 
 	\end{lemma}
 
 	\begin{proof}
+		Think of $h(m_0)$ as some hardwired value.
 		Suppose that for all $m_0, m_1$, we have $p_{f_0}(m_0) - q_{f_0}(m_1) < \varepsilon$.
 		Let $p(x)$ denote the probability of generating $x$, i.e., $p(x) = \Pr[M_s(1^{n}) = x]$.
 
-		Then, consider the following weighted sum, which is small:
+		Then, consider the following weighted sum:
 		\begin{align*}
-			&\sum_{m_0, m_1} p(m_0) p(m_1) (p_{f_0}(m_0) - q_{f_0}(m_1)) = \\
-			&\underbrace{\left(\sum_{m_1} p(m_1)\right)}_{=1} \cdot \left(\sum_{m_0} p(m_0) p_{f_0}(m_0)\right) + \sum_{m_0, m_1} p(m_0) p(m_1) q_{f_0}(m_1) = \\
-			&\sum_{m_0} p(m_0) p_{f_0}(m_0) + \sum_{m_0, m_1} p(m_0) p(m_1) q_{f_0}(m_1).
+			\frac{1}{\poly(n)} > &\sum_{m_0, m_1} p(m_0) p(m_1) (p_{f_0}(m_0) - q_{f_0}(m_1)) = \\
+			&\underbrace{\left(\sum_{m_1} p(m_1)\right)}_{=1} \cdot \left(\sum_{m_0} p(m_0) p_{f_0}(m_0)\right) - \sum_{m_0, m_1} p(m_0) p(m_1) q_{f_0}(m_1) = \\
+			&\sum_{m_0} p(m_0) p_{f_0}(m_0) - \sum_{m_0, m_1} p(m_0) p(m_1) q_{f_0}(m_1).
 		\end{align*}
 
 		The left sum represents the probability of success for the original $A_s$.
@@ -283,19 +286,19 @@ Here, for $E$ we denote the encryption algorithm, and $e$ is the public code.
 
 		Now, we construct a new adversary $\tilde{A}_s(h_*)$, where $h_* = h(m_0)$ (hardcoded):
 		\begin{itemize}
-			\item Choose a random $m \gets M_S$,
-			\item Encrypt $m$ and run $A_s(E(m, \ldots), h_*)$.
+			\item Choose a random $m_1 \gets M_S$,
+			\item Encrypt $m_1$ and run $A_s(E(e, m_1), e, h_*)$.
 		\end{itemize}
 		Therefore, the success probability of $\tilde{A}_s$ is exactly
 		\[
 		\sum_{k} \mu_k \left( \sum_{m_1} p(m_1) q_k(m_1) \right).
 		\] 
-		This implies that the success probability of $A_s$ is small, which is a contradiction.
+		Hence, it means that probability of success between $A_s$ and  $\tilde A_s$ is negligible, but  $\tilde A_s$ is silly!
 	\end{proof}
 
-	Now, choose $m_0, m_1$ such that $f(m_0) \neq f(m_1)$ and
+	Now, choose $m_0, m_1$ such that
 	\[
-		p_{f_0}(m_0) - q_{f_0}(m_1) > \varepsilon.
+		p_{f_0}(m_0) - q_{f_0}(m_1) > \frac{1}{\poly(n)}.
 	\] 
 
 	Define a new adversary $A_l$ that, given an encrypted message $m$, attempts to distinguish $m$ chosen from the set $\{m_0, m_1\}$ (each selected with probability $\frac{1}{2}$):
@@ -327,9 +330,22 @@ Here, for $E$ we denote the encryption algorithm, and $e$ is the public code.
 \end{exercise}
 
 \begin{exercise}
-	We did not say whether the oblivious $\tilde A_s$ should get also the public key or not.
+    In the \Cref{def:semantic_security}, $A, \tilde A$ gets also the public key.
 	Is it important?
 \end{exercise}
+\begin{proof}
+    One can show that it is not important.
+    Denote SS for semantic security and SS' for semantic security, but where $A, \tilde{A}$.
+    Also, let $B, \tilde{B}$ be the adversaries in SS'.
+    Then, $\neg$SS' $\implies \neg$ SS.
+
+    $\neg$SS $\implies \neg$SS'.
+    Truly, if 
+    \begin{align*}
+	\Pr[A(E(e, m), e, h(m)) = f(m)] > \Pr[\tilde{A}(e, h(m)) = f(m)] + \varepsilon(n).
+    \end{align*}
+    Then, let $h'(m) = (h(m), e)$.
+\end{proof}
 \begin{remark}
 	Our definitions have been the same for public and private key settings so far.
 \end{remark}

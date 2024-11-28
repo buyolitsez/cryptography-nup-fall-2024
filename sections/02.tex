@@ -10,7 +10,7 @@ Similarly, let $\FP$ denote the class of problems for which a~solution can be fo
 \end{definition}
 
 \begin{theorem}
-    If $\PP \neq \NP$, then there exists an $f \in \fP$ such that $f^{-1} \not\in \fP$.
+If $P \neq \NP$, then there exists an $f \in \fP$ such that $f^{-1} \not\in \fP$.
 \end{theorem}
 
 \begin{proof}
@@ -24,18 +24,18 @@ Similarly, let $\FP$ denote the class of problems for which a~solution can be fo
     \end{align*}
     If we could invert $f$, we would be able to solve SAT by computing $f^{-1}(\Phi, 1^n)$.
 
-    Therefore, if $\PP \neq \NP$ and both $f$ and $f^{-1}$ belong to $\fP$, it would imply $\PP = \NP$.
-    Conversely, if $\PP = \NP$, then $f^{-1} \not\in \fP$.
+    Therefore, if $P \neq \NP$ and both $f$ and $f^{-1}$ belong to $\fP$, it would imply $P = \NP$.
+    Conversely, if $P = \mathbb{N}P$, then $f^{-1} \not\in \fP$.
 \end{proof}
 
 \begin{exercise}
-	Prove the converse of our "worst-case theorem": if there exists an $f$ such that $f \in  \fP$ and $f^{-1} \not\in \fP$, then $\PP \neq \NP$.
+	Prove the converse of our "worst-case theorem": if there exists an $f$ such that $f \in  \fP$ and $f^{-1} \not\in \fP$, then $P \neq \NP$.
 \end{exercise}
 
 \begin{proof}
-	Assume that $f \in  \fP$, $f^{-1} \not\in  \fP$, and that $\PP = \NP$.
+	Assume that $f \in  \fP$, $f^{-1} \not\in  \fP$, and that $P = \NP$.
 	In this case, we could invert $f$ by nondeterministically guessing a satisfying assignment, which can be verified in polynomial time.
-	Consequently, such a nondeterministic algorithm could be transformed into a deterministic one, given that $\PP = \NP$.
+	Consequently, such a nondeterministic algorithm could be transformed into a deterministic one, given that $P = \NP$.
 \end{proof}
 
 \begin{statement}
@@ -58,7 +58,7 @@ Let $f \colon \{0, 1\}^* \to \{0, 1\}^*$.
 Consider a family of sliced functions: $f_i \colon \{0, 1\}^i \to \{0, 1\}^i$, or more generally, $f_i \colon \{0, 1\}^{n(i)} \to \{0, 1\}^{m(i)}$ for some polynomials $n(i)$ and $m(i)$.
 
 \begin{definition}
-    We say that a function $f \colon \{0, 1\}^* \to \{0, 1\}^*$ with slices $\{f_n\}_{n \in \N}$ is \emph{one-way} if:
+    We say that a function $f \colon \{0, 1\}^* \to \{0, 1\}^*$ with slices $\{f_n\}_{n \in \mathbb{N}}$ is \emph{one-way} if:
     \begin{itemize}
         \item $f_n \colon \{0, 1\}^n \to \{0, 1\}^n$ can be computed in time $\poly(n)$.
         \item For every polynomial-time randomized adversary $A$ and for every integer $k$,
@@ -93,7 +93,7 @@ This leads us to the next definition.
         \item $e_n \colon \{0, 1\}^n \to \{0, 1\}^{m(n)}$ (the function itself),
         \item $s_n \colon \{0, 1\}^{\sigma(n)} \to \{0, 1\}^n$ (a sampler, which takes random bits and produces a specified distribution).
     \end{itemize}
-    The following property must hold: for all polynomial-time randomized adversaries $A$ and for every $k \in \N$, there exists an $N$ such that for all $n > N$,
+    The following property must hold: for all polynomial-time randomized adversaries $A$ and for every $k \in \mathbb{N}$, there exists an $N$ such that for all $n > N$,
     \[
         \Pr[A(e_n(s_n(r_s)), 1^n, e_n, s_n) \in e^{-1}(e_n(s_n(r_s)))] < \frac{1}{n^k},
     \]
@@ -227,7 +227,7 @@ Our one-way functions will typically possess the following properties:
         f(x_1, \ldots, x_n, I) = (x_1, x_2, \ldots, x_n, \sum_{i \in I} x_i),
     \]
     where $I \subseteq [n]$.
-	This corresponds to the \emph{Subset Sum} problem, which is $\NP$-complete.
+	This corresponds to the \emph{Subset Sum} problem, which is $\mathbb{N}P$-complete.
 \end{example}
 
 \begin{example}[Discrete logarithm]
@@ -312,12 +312,12 @@ Essentially, the main difficulty arises from the randomness in the bits.
 Given $e$ and knowledge of the specific bits used, inversion is feasible (as $d$ can be generated).
 However, without knowledge of these bits, inversion becomes computationally challenging.
 
-\begin{example}[RSA, Rivest-Shamir-Adleman]
+\begin{scheme}[RSA, Rivest-Shamir-Adleman]
     Let $p, q \in \mathbb{P}$ (secret).
     Define $N = p \cdot q$ (publicly known).
     Choose $\varepsilon, \delta$ from $\mathbb{Z}_N$ such that $\varepsilon \cdot \delta = 1 \mod (p - 1)(q - 1)$ (secret).
     Then define $s(x) = x$, $e(x) = x^{\varepsilon} \mod N$, and $d(x) = x^{\delta} \mod N$.
-\end{example}
+\end{scheme}
 
 \begin{proof}
     We show that this construction works:
