@@ -196,8 +196,8 @@ In the proof below, $U$ denotes a uniform distribution of strings of fixed lengt
 	If \( G \) is not a pseudorandom generator (PRG), the adversary \( A \) can distinguish between the following two distributions:
 	
 	\begin{align*}
-	    G_{i+1}(x), f^{i+1}(x), B(x), B(f(x)), \dots, B(f^i(x)), \\
-	    G_i(x), f^i(x), b_i, B(x), \dots, B(f^{i-1}(x)).
+	    G_{i+1}(x): f^{i+1}(x), B(x), B(f(x)), \dots, B(f^i(x)), \\
+	    G_i(x): f^i(x), b_i, B(x), \dots, B(f^{i-1}(x)).
 	\end{align*}
 	
 	We aim to distinguish these distributions based on a single bit. As we did uniform from $G_1$ and as we essentially compute the hardcore predicate from that. By definition, we should not be able to compute the hardcore predicate efficiently. The adversary is given one of the following two cases:
