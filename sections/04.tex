@@ -191,16 +191,35 @@ In the proof below, $U$ denotes a uniform distribution of strings of fixed lengt
 						   &+ \Pr[b = \overline{B(x)}] \cdot \Pr[A(f(x) \circ \overline{B(x)}) \neq 1] \\
 						   &= \frac{1}{2} \alpha + \frac{1}{2} (1 - \beta) = \frac{1}{2} + \frac{\alpha - \beta}{2} \ge  \frac{1}{2} + \frac{1}{l^{k}}.
   \end{align*}
-  Thus, we can break $B$.
-
-  Now, suppose that an adversary $A$ can distinguish between $G_i(U)$ and $G_{i + 1}(U)$. \todo{it is not correct, fix}
-  We will show that this implies an ability to distinguish between $U$ and $G_1(U)$.
-  
-  Let $x$ and $z$ be random variables (uniformly distributed) such that $|z| = |x| + 1$.
-  Then $A$ can distinguish between:
-   \begin{align*}
-	   G_{i + 1}(x) &= g^{i + 1}(x) \circ B(x) \circ B(g(x)) \circ \dots \circ B(g^{i}(x)),\\
-	   G_{i}(z) &= g^{i}(z) \circ B(z) \circ B(g(z)) \circ \dots \circ B(g^{i - 1}(z)).
-   \end{align*}
-  Hence, $A$ distinguishes between $g^{i + 1}(x) \circ B(x)$ and $g^{i}(z) \gets U$.
+	  Thus, we can break $B$.
+	  
+	If \( G \) is not a pseudorandom generator (PRG), the adversary \( A \) can distinguish between the following two distributions:
+	
+	\begin{align*}
+	    G_{i+1}(x): f^{i+1}(x), B(x), B(f(x)), \dots, B(f^i(x)), \\
+	    G_i(x): f^i(x), b_i, B(x), \dots, B(f^{i-1}(x)).
+	\end{align*}
+	
+	We aim to distinguish these distributions based on a single bit. As we did uniform from $G_1$ and as we essentially compute the hardcore predicate from that. By definition, we should not be able to compute the hardcore predicate efficiently. The adversary is given one of the following two cases:
+	
+	\begin{align*}
+	    \quad y = f(x), \, b = B(x), \, \text{where } x \leftarrow U_n, \\
+	    \quad y = z, \, b = b_i, \, \text{where } z \leftarrow U_n, \, b_i \leftarrow U_1.
+	\end{align*}
+	
+	In the second line, the output is truly random. In the first one, the output is the result of a one-way function \( f(x) \) and hardcore predicate \( B(x) \). The question is: how can we distinguish between these two cases?
+	
+	Let us use the adversary \( A \), who distinguishes \( G_i \) and \( G_{i+1} \). We interpret \( A(y) \) as \( f(x) \). If \( A(y) \) correctly identifies \( f(x) \) and \( b \) matches \( B(x) \), then the distribution corresponds to \( G_{i+1}(x) \):
+	
+	\[
+	f^{i+1}(x), B(x), B(f(x)), \dots, B(f^i(x)).
+	\]
+	
+	On the other hand, if the input consists of uniform random numbers, the distribution corresponds to \( G_i(x) \):
+	
+	\[
+	f^i(z), b_i, B(z), \dots, B(f^{i-1}(z)).
+	\]
+	
+	This matches exactly what the original adversary is distinguishing between, with a substantial advantage over \( 50\% \).
 \end{proof}
