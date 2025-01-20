@@ -157,16 +157,22 @@ Alice can decrypt the message using $d^{m}(e^{m}(r)) = r$, allowing her to compu
 	If $g$ is a length-preserving one-way permutation (OWP) and $B$ is its hardcore predicate, then there exists an $f(l)$-PRG, defined by
 	 \[
 	  G_{f(l)}(x) = g^{f(l) - l}(x) \circ B(x) \circ B(g(x)) \circ \dots \circ B(g^{f(l) - l - 1}(x)).
-	 \] 
+	 \]
 \end{lemma}
 This construction extends the input by $i$ bits.
+I.e.
+\begin{align*}
+    G_l(x) &= x, \\
+    G_{l + 1}(x) &= g(x) \circ B(x), \\
+    G_{l + 2}(x) &= g(g(x)) \circ B(x) \circ B(g(x)),
+\end{align*} and so on.
 In the proof below, $U$ denotes a uniform distribution of strings of fixed length, though $U$ may refer to different lengths depending on the context.
 
 \begin{proof}
-  Idea: if we can distinguish $U$ from $G_{f(l)}(U)$, then there exists an index $i$ where we can distinguish between $G_i(U)$ and $G_{i + 1}(U)$.
+  Idea: if we can distinguish $U$ from $G_{f(l)}(U)$, then there exists an index $i$ where we can distinguish between $G_{l + i}(U)$ and $G_{l + i + 1}(U)$.
 
-  Consider the case where one can distinguish between $U$ and $G_{1}(U)$.
-  Suppose that $G(x) = G_1(x) = g(x) \circ B(x)$ is broken by some adversary $A$:
+  Consider the case where one can distinguish between $U$ and $G_{l + 1}(U)$.
+  Suppose that $G(x) = G_{l + 1}(x) = g(x) \circ B(x)$ is broken by some adversary $A$:
    \[
 	   \left| \underbrace{\Pr[A(G(x)) = 1]}_{\gamma} - \underbrace{\Pr[A(y) = 1]}_{\nu} \right| \ge \frac{1}{l^{k}}
   ,\] 
@@ -193,11 +199,11 @@ In the proof below, $U$ denotes a uniform distribution of strings of fixed lengt
   \end{align*}
 	  Thus, we can break $B$.
 	  
-	If \( G \) is not a pseudorandom generator (PRG), the adversary \( A \) can distinguish between the following two distributions:
-	
+	Now, if one distinguishes between $G_{l + i}(U)$ and $G_{l+i+1}$, then $i \ge 1$.
+	I.e. one can distinguish between the following:
 	\begin{align*}
-	    G_{i+1}(x): f^{i+1}(x), B(x), B(f(x)), \dots, B(f^i(x)), \\
-	    G_i(x): f^i(x), b_i, B(x), \dots, B(f^{i-1}(x)).
+	    G_{l+i+1}(x) &= g^{i+1}(x), B(x), B(g(x)), \dots, B(g^i(x)), \\
+	    G_{l+i}(x) &= g^i(x), b_i, B(x), \dots, B(g^{i-1}(x)).
 	\end{align*}
 	
 	We aim to distinguish these distributions based on a single bit. As we did uniform from $G_1$ and as we essentially compute the hardcore predicate from that. By definition, we should not be able to compute the hardcore predicate efficiently. The adversary is given one of the following two cases:
