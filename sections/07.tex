@@ -87,7 +87,13 @@ This should be done in a way such that Alice has no idea, which envelop was open
 \end{definition}
 We will use it in our scheme.
 Consider \emph{semi-honest} participants.
-So, they follow the protocol, but can compute something in addition.
+\begin{definition} \label{df:semi_honest}
+    We say that a participant is \emph{semi-honest} if it follows the protocol but attempts to compute additional information to obtain further insights.
+\end{definition}
+
+\begin{definition} \label{df:malicious}
+    We say that a participant is \emph{malicious} if it does not adhere to the protocol in an effort to acquire unauthorized information.
+\end{definition}
 
 \begin{scheme}
 \begin{enumerate}

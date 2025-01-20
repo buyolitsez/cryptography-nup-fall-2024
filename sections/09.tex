@@ -1,0 +1,73 @@
+%12.12.2024
+
+\subsection{Forcing Malicious to be Semi-Honest}
+
+We are going to use the Zero-Knowledge protocol in order to force malicious participants to be semi-honest (see \Cref{df:semi_honest,df:malicious} for more information).
+
+To do so we need to learn how to do the following things:
+\begin{itemize}
+    \item Select public random string together to ensure it's generated uniformly.
+    \item Delegate computation for unknown input (perhaps bounded by prior commitment), while having some public "check-sum" information.
+    \item Persuade that a string is in the image of a function without revealing the preimage.
+    \item Delegate computation for unknown input (perhaps bounded by prior commitment), while having some \emph{secret} "check-sum" information and requesting to recalculate it.
+    \item Delegate random sampling according to a polynomial-time samplabale distribution.
+    \item Input commitment with provably random keys and with optional opening (some envelops won't be opened).
+    \item Show it's enough for Yao's secure 2-party computation protocol.
+\end{itemize}
+\todo[inline]{make above list more clear}
+
+\subsubsection{Tossing a Coin Together}
+
+\begin{scheme}[Failed Attempt]
+    \begin{itemize}
+        \item Alice selects $a \in U_1$, Bob selects $b \in U_1$.
+	\item They exchange the bits.
+	\item Now $a \oplus b$ is distributed as $U_1$.
+    \end{itemize}
+\end{scheme}
+\begin{proof}
+The one who sends the bit the first looses control!
+Indeed, the other one (say, Bob) can cheat by setting $b \coloneqq 1 \oplus a$, for example.
+\end{proof}
+
+\begin{scheme}[Correct Scheme]
+    \begin{itemize}
+        \item Alice selects $a \in U_1$, Bob selects $b \in  U_1$.
+	\item Alice sends a commitment $C_s(a)$, where $s$ is the secret key.
+	\item Bob sends $b$.
+	\item Alice sends $s$.
+	\item They treat $a \oplus b$ as a randomly generated bit.
+    \end{itemize}
+\end{scheme}
+
+But $a \oplus b$ is not $U_1$, since there is still some small error in bit commitment scheme.
+\begin{exercise}
+    Prove formally that $a \oplus b$ is distributed almost as $U_1$.
+    In particular, the so-generated strings are computationally indistinguishable from $U_n$.
+\end{exercise}
+
+\subsubsection{Delegating the computation, simple version}
+
+\begin{problem}
+    We want to delegate computing $f(x)$ without knowing $x$ by public checksums noted as $h(x)$.
+    \begin{itemize}
+        \item Alice knows $x$, Bob knows $h(x)$.
+	\item Alice sends $f(x)$ to Bob without revealing $x$.
+	\item Bob gets convinced that he received a correct value.
+    \end{itemize}
+    Here, $f, h$ are polynomial-time computable functions.
+\end{problem}
+
+\begin{scheme}
+    \begin{itemize}
+	\item Let $L = \{ (u, v) \mid \exists x  \colon u = f(x), v = h(x) \} \in \NP$.
+	\item Alice knows $(u, v)$ since she knows $x, f, h$.
+	\item Bob knows $(u, v)$ since he received them.
+	\item Thus, we can use the $\mathrm{CZK}$ protocol.
+    \end{itemize}
+\end{scheme}
+\begin{exercise}
+    Prove it formally.
+\end{exercise}
+
+\subsubsection{Hit the Image}

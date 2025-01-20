@@ -2,6 +2,7 @@
 
 \section{Zero-Knowledge Proofs}
 
+
 Alice holds some $x$ and a~$\prf$ that $x \in L$, where $x \in \{ 0, 1 \}^{*}$ and $L \subseteq  \{ 0, 1 \}^{*}$.
 Additionally, Bob also holds the same $x$.
 The task for Alice is to convince Bob that she possesses a~$\prf$ by revealing the least possible amount of information. 
@@ -24,6 +25,8 @@ Specifically, Bob should get only the information that $x \in  L$.
 	\todo[inline]{Am I right that $r \in U$ is the random bits?}
     \end{itemize}
 \end{definition}
+
+\subsection{$\NP$ is in $\mathrm{CZK}$}
 
 \begin{theorem}
     If one-way functions exist, then $\NP \subseteq \mathrm{CZK}$.
