@@ -1,9 +1,10 @@
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ fix}{21}{section*.2}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{22}{section*.3}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{28}{section*.4}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ picture}{31}{section*.5}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{31}{section*.6}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ Am I right that $r \in U$ is the random bits?}{31}{section*.7}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ Didn't get the proof. Why we compute some $\genfrac {}{}{}{}{1}{6}$? What are we calculating? What has we proved? And we proved it for some specific $\tilde {V}$, right? Not any one?}{32}{section*.8}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ isn't it a contradiction to Zero Knowledge? if Bob can reconstruct some coloring of our graph}{32}{section*.9}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ make above list more clear}{33}{section*.10}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ fix}{16}{section*.2}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{17}{section*.3}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{21}{section*.4}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ picture}{23}{section*.5}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{23}{section*.6}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ Clarify the above list for greater precision and readability.}{24}{section*.7}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ Clarify what it means for unopened envelopes to "contain something" and how this is formally ensured.}{26}{section*.14}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ is it true?}{27}{section*.15}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ fix the protocol}{27}{section*.16}%
+\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish the last slide}{27}{section*.18}%

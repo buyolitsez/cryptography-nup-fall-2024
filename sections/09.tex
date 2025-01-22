@@ -1,73 +1,268 @@
 %12.12.2024
 
-\subsection{Forcing Malicious to be Semi-Honest}
+\subsection{Forcing Malicious Participants to be Semi-Honest}
 
-We are going to use the Zero-Knowledge protocol in order to force malicious participants to be semi-honest (see \Cref{df:semi_honest,df:malicious} for more information).
+We aim to utilize the Zero-Knowledge protocol to compel malicious participants to behave in a semi-honest manner (see \Cref{df:semi_honest,df:malicious} for further details).
 
-To do so we need to learn how to do the following things:
+To achieve this, we must develop methods to address the following tasks:
+
 \begin{itemize}
-    \item Select public random string together to ensure it's generated uniformly.
-    \item Delegate computation for unknown input (perhaps bounded by prior commitment), while having some public "check-sum" information.
-    \item Persuade that a string is in the image of a function without revealing the preimage.
-    \item Delegate computation for unknown input (perhaps bounded by prior commitment), while having some \emph{secret} "check-sum" information and requesting to recalculate it.
-    \item Delegate random sampling according to a polynomial-time samplabale distribution.
-    \item Input commitment with provably random keys and with optional opening (some envelops won't be opened).
-    \item Show it's enough for Yao's secure 2-party computation protocol.
+    \item Jointly select a public random string to ensure that it is generated uniformly.
+    \item Delegate computation for an unknown input (possibly constrained by a prior commitment), while maintaining some publicly verifiable "check-sum" information.
+    \item Demonstrate that a string belongs to the image of a function without disclosing its preimage.
+    \item Delegate computation for an unknown input (possibly constrained by a prior commitment), while preserving some \emph{secret} "check-sum" information and requiring its recalculation.
+    \item Facilitate random sampling according to a polynomial-time samplable distribution.
+    \item Implement input commitment with provably random keys, allowing optional opening (with some commitments remaining unopened).
+    \item Show that these techniques suffice to establish Yao's secure two-party computation protocol.
 \end{itemize}
-\todo[inline]{make above list more clear}
+
+\todo[inline]{Clarify the above list for greater precision and readability.}
+
+So, in this section, we assume that both Alice and Bob may potentially deviate from the protocol. 
+In such cases, the protocol must enable the honest party to detect any non-compliance by the other participant (with high probability). 
+The protocol can succeed only if both players behave honestly.
 
 \subsubsection{Tossing a Coin Together}
 
-\begin{scheme}[Failed Attempt]
+\begin{scheme}[Failed Attempt] \
     \begin{itemize}
-        \item Alice selects $a \in U_1$, Bob selects $b \in U_1$.
-	\item They exchange the bits.
-	\item Now $a \oplus b$ is distributed as $U_1$.
+        \item Alice selects $a \in U_1$, and Bob selects $b \in U_1$.
+        \item They exchange their selected bits.
+        \item The value $a \oplus b$ is then treated as a random bit distributed according to $U_1$.
     \end{itemize}
 \end{scheme}
+
 \begin{proof}
-The one who sends the bit the first looses control!
-Indeed, the other one (say, Bob) can cheat by setting $b \coloneqq 1 \oplus a$, for example.
+The participant who sends their bit first loses control.
+Specifically, the other participant (e.g., Bob) can cheat by choosing $b \coloneqq 1 \oplus a$, thereby manipulating the outcome.
 \end{proof}
 
-\begin{scheme}[Correct Scheme]
+\begin{scheme}[Correct Scheme] \ \label{scheme:tossing_coin}
     \begin{itemize}
-        \item Alice selects $a \in U_1$, Bob selects $b \in  U_1$.
-	\item Alice sends a commitment $C_s(a)$, where $s$ is the secret key.
-	\item Bob sends $b$.
-	\item Alice sends $s$.
-	\item They treat $a \oplus b$ as a randomly generated bit.
+        \item Alice selects $a \in U_1$, and Bob selects $b \in U_1$.
+        \item Alice sends a commitment $C_s(a)$, where $s$ is a secret key.
+        \item Bob sends $b$.
+        \item Alice reveals $s$.
+        \item The value $a \oplus b$ is then treated as a randomly generated bit.
     \end{itemize}
 \end{scheme}
 
-But $a \oplus b$ is not $U_1$, since there is still some small error in bit commitment scheme.
+However, $a \oplus b$ is not perfectly distributed according to $U_1$ due to a small error inherent in the bit commitment scheme.
+
 \begin{exercise}
-    Prove formally that $a \oplus b$ is distributed almost as $U_1$.
-    In particular, the so-generated strings are computationally indistinguishable from $U_n$.
+    Prove formally that $a \oplus b$ is distributed almost uniformly as $U_1$.
+    Specifically, demonstrate that the resulting strings are computationally indistinguishable from $U_n$.
 \end{exercise}
 
-\subsubsection{Delegating the computation, simple version}
+\subsubsection{Delegating the Computation: Public Checksum}
 
 \begin{problem}
-    We want to delegate computing $f(x)$ without knowing $x$ by public checksums noted as $h(x)$.
+    We aim to delegate the computation of $f(x)$ without revealing the input $x$, by relying on public checksums denoted as $h(x)$. The setup is as follows:
     \begin{itemize}
-        \item Alice knows $x$, Bob knows $h(x)$.
-	\item Alice sends $f(x)$ to Bob without revealing $x$.
-	\item Bob gets convinced that he received a correct value.
+        \item Alice knows $x$, while Bob knows $h(x)$.
+        \item Alice sends $f(x)$ to Bob without disclosing $x$.
+        \item Bob must be convinced that the received value is correct.
     \end{itemize}
-    Here, $f, h$ are polynomial-time computable functions.
+    Here, $f$ and $h$ are polynomial-time computable functions.
+\end{problem}
+
+\begin{scheme} \ \label{scheme:public_checksum}
+    \begin{itemize}
+        \item Define the language $L = \{ (u, v) \mid \exists x \colon u = f(x), v = h(x) \} \in \NP$.
+        \item Alice knows $(u, v)$ because she has knowledge of $x$, as well as the functions $f$ and $h$.
+        \item Bob knows $(u, v)$ since he receives them from Alice.
+        \item Therefore, the problem can be addressed using the $\mathrm{CZK}$ (Computational Zero-Knowledge) protocol.
+    \end{itemize}
+\end{scheme}
+
+\begin{exercise}
+    Provide a formal proof to validate the correctness and security of this scheme.
+\end{exercise}
+
+\subsubsection{Hit the Image}
+
+\begin{problem}
+    Alice possesses some $x$ and wishes to send $f(x)$, where $f$ is a fixed function, without disclosing $x$.
+\end{problem}
+
+\begin{scheme} \ \label{scheme:image}
+    \begin{itemize}
+        \item Define the language $L = \mathrm{Im}(f)$~-- the image of the function $f$.
+        \item Since both Alice and Bob are aware of the function $f$, they can employ the Strong $\mathrm{CZK}$ protocol to achieve this.
+    \end{itemize}
+\end{scheme}
+\begin{remark}
+    As an additional outcome, Bob is convinced that Alice possesses knowledge of some $x$ such that $f(x)$ holds, demonstrating her knowledge of at least one preimage.
+\end{remark}
+
+\begin{exercise}
+    Provide a formal proof that this scheme ensures the correctness and security of the described protocol.
+\end{exercise}
+
+\subsubsection{Delegating the Computation: Private Checksum}
+
+\begin{problem}
+    Alice possesses $x$, while Bob holds $y$ (which may or may not equal a checksum $h(x)$).
+    The protocol should ensure the following properties:
+    \begin{itemize}
+        \item If $h(x) = y$, Bob is convinced that Alice knows $x$ and that the values received ($f(x)$ and $h(x)$) are correct, without learning anything further about $x$.
+        \item If $h(x) \neq y$, Bob still learns nothing about $x$ beyond the received values $f(x)$ and $h(x)$.
+    \end{itemize}
+    Here, $f$ and $h$ are polynomial-time computable functions.
+\end{problem}
+
+\begin{scheme} \
+    \begin{itemize}
+        \item Alice sends $f(x)$ and $h(x)$ as an image point of the tuple $(f, h)$.
+        \item However, since Bob may not initially know $h(x)$, there is a risk that their communication could concern different values of $x$. To mitigate this, Alice must convince Bob that $y = h(x)$ holds.
+        \item Define the language $L = \{ (u, v) \mid \exists x \colon u = f(x), v = h(x) \} \in \NP$.
+        \item Employ the Strong $\mathrm{CZK}$ protocol to ensure that Alice can prove membership in $L$ without revealing $x$. Following this, Bob verifies whether $y = h(x)$.
+        \item If Bob was unaware of $h(x)$ beforehand, the protocol ensures that he gains no additional information about $x$ beyond learning $h(x)$.
+    \end{itemize}
+\end{scheme}
+\begin{remark}
+Here, we employed the $\mathrm{CZK}$ protocol twice:
+\begin{itemize}
+    \item The first instance was used when sending an image point to ensure that $y = h(x)$, thereby convincing Bob that the checksum matches.
+    \item The second instance was utilized to prove membership of $x$ in the language $L$, facilitating the secure transfer of $f(x)$ to Bob.
+\end{itemize}
+\end{remark}
+
+\begin{exercise}
+    Provide a formal proof to demonstrate that the described scheme guarantees both correctness and security, as specified in the problem statement.
+\end{exercise}
+
+\subsubsection{Forcing Polynomial-Time Samplable Randomness}
+
+\begin{suggestion}
+    For a binary string $u \in \{ 0, 1 \}^*$, we write $C_t(u)$ to denote a vector of commitments $C_{t^{(i)}}$, where $t^{(i)}$ represents the commitment parameters for each bit of $u$.
+\end{suggestion}
+
+\begin{problem}
+    Alice acts as a polynomial-time sampler, trusted by Bob, but Bob does not learn the seed. 
+    Let $s \colon \{ 0, 1 \}^l \to \Omega$ be a polynomial-time computable function, where $l = l(n)$ and $\Omega$ is any set. 
+    Alice generates a uniformly random seed $r \gets U_l$ and sends $s(r)$ to Bob. 
+    The goal is to ensure that Bob:
+    \begin{itemize}
+        \item Does not learn $r$, and
+        \item Is convinced that the distribution of $s(r)$ corresponds to $s(U_l)$.
+    \end{itemize}
+\end{problem}
+
+\begin{remark}
+    In the coin-tossing protocol (\Cref{scheme:tossing_coin}), both Alice and Bob are aware of each other's seed. 
+    In this case, however, they only know the outcome of the computation.
+\end{remark}
+
+\begin{scheme} \ \label{scheme:sampling}
+    \begin{itemize}
+        \item Alice selects $t_1, \ldots, t_l \in U_n$ and $r' \in U_l$. She sends commitments $C_t(r')$ to Bob and persuades him of their correctness using the image protocol (\Cref{scheme:image}). 
+        Here, $t_1, \ldots, t_l$ are the commitments for the individual bits of $r'$, and the use of the image protocol convinces Bob that these commitments were honestly generated. This ensures that Alice cannot change the value of $r'$.
+        \item Alice and Bob jointly generate $r'' \gets U_l$ using the coin-tossing protocol (\Cref{scheme:tossing_coin}).
+        \item Alice computes $r \coloneqq r' \oplus r''$.
+        \item Bob delegates the computation of $s(r)$ to Alice and obtains the following values:
+        \begin{align*}
+            f(r', t, r'') &= s(\underbrace{ r' \oplus r'' }_{ =r }) &&\text{Alice computes and sends this to Bob}, \\
+            h(r', t, r'') &= (C_t(r'), r'') &&\text{Bob already knows these values}.
+        \end{align*}
+	Here, the checksum is public, i.e. we use \Cref{scheme:public_checksum}.
+    \end{itemize}
+\end{scheme}
+
+\begin{remark}
+    Here, we used the fact that the commitment is a function of the bid and the key.
+\end{remark}
+
+\begin{exercise}
+    Provide a formal proof to validate the correctness and security of this scheme.
+\end{exercise}
+
+\subsubsection{All-Confident Input Commitment}
+
+In this section, we extend the known bit commitment scheme. 
+The primary difference is that some of the envelopes sent by Alice will remain unopened. 
+However, we still need to ensure that these unopened envelopes contain valid commitments (i.e., Alice has committed to some values).
+I.e. that Alice packed in commitments something that she supposed to.
+
+\todo[inline]{Clarify what it means for unopened envelopes to "contain something" and how this is formally ensured.}
+
+\begin{problem}
+    Alice commits to the bits of $x$ and proves that she has done so, even without opening all the envelopes. 
+    The process is as follows:
+    \begin{itemize}
+        \item Alice has a value $x$ and generates random commitment keys $r$.
+        \item She sends the commitments to Bob.
+        \item Bob must be convinced that Alice has made valid commitments to some unknown data, with $r$ generated uniformly at random.
+        \item Bob can choose to open some envelopes or abstain from doing so but learns nothing about the other bits or keys.
+    \end{itemize}
 \end{problem}
 
 \begin{scheme}
     \begin{itemize}
-	\item Let $L = \{ (u, v) \mid \exists x  \colon u = f(x), v = h(x) \} \in \NP$.
-	\item Alice knows $(u, v)$ since she knows $x, f, h$.
-	\item Bob knows $(u, v)$ since he received them.
-	\item Thus, we can use the $\mathrm{CZK}$ protocol.
+        \item Alice first sends a "pre-commitment" $C_s(x)$ for a random $s$, using the image protocol (\Cref{scheme:image}). 
+	    At this stage, Bob does not know whether $s$ is random\todo{is it true?}.
+        \item Alice uses the polynomial-time sampling protocol (\Cref{scheme:sampling}) to generate $r$ and $t$ uniformly at random. 
+        Bob receives $C_t(r)$, ensuring that he has no knowledge of $r$ or $t$, but he is assured that they were generated randomly.
+        \item Alice then sends $C_r(x)$ to Bob. 
+        Bob holds Alice's commitment for $r$ and $x$ and can verify whether these were used correctly in the computation using the delegated computing protocol for $C_r(x)$ (a private version). 
+        \item After this step, Bob gains no information about $x$ or $r$. 
+        However, upon request, Bob can verify the final commitments to parts of $x$. 
+        The secret keys associated with these commitments are guaranteed to be random, as ensured by the sampling protocol, since they serve as the seeds.
     \end{itemize}
 \end{scheme}
+
+\todo[inline]{fix the protocol}
+
 \begin{exercise}
-    Prove it formally.
+    Provide a formal proof to validate the correctness and security of this scheme.
 \end{exercise}
 
-\subsubsection{Hit the Image}
+\subsubsection{Forcing Malicious Adversaries to Behave Semi-Honestly}
+
+\begin{scheme}
+We have a function $f$, that is a protocol and we want to compute its outcome.
+The process is divided into several stages:
+
+\begin{itemize}
+    \item \textbf{Input Commitment:} 
+    Alice and Bob commit their (secret) inputs using "provably random" keys, denoted $s_a$ and $s_b$, respectively. 
+    This ensures that they can be held accountable for performing actions based on specific committed data. 
+    Any inconsistencies in their computations can be identified at a later stage.
+
+    \item \textbf{Randomness Commitment:} 
+    Alice and Bob commit their (secret) randomness using additional "provably random" keys, denoted $s_a'$ and $s_b'$, respectively. 
+    Since randomness is treated as additional input data, this step ensures that their randomness is indeed uniform and honestly generated.
+
+    \item \textbf{Computation:} 
+    Consider Bob's perspective (noting that the roles of Alice and Bob are symmetric). 
+    Let:
+    \begin{itemize}
+        \item $a$ represent Alice's input, 
+        \item $r_a$ represent Alice's randomness,
+        \item $s_a, s_a'$ represent Alice's commitment keys,
+        \item $m_a$ represent Alice's messages, and
+        \item similarly define $b$, $r_b$, $s_b, s_b'$, and $m_b$ for Bob.
+    \end{itemize}
+    Note that neither Alice nor Bob will open the envelopes of the other's commitments. 
+
+    The protocol proceeds as follows:
+    \begin{itemize}
+        \item Bob delegates the computation of Alice's messages using the function $f$, which generates the messages that Alice should send to Bob if she behaves honestly. 
+        \item Alice's arguments for this computation are $(a, r_a, s_a, s_a', m_b)$.
+        \item Bob verifies these computations using a checksum function $h$, which outputs Alice's public commitments for her input and randomness:
+        \[
+        h(a, r_a, s_a, s_a', m_b) = (C_{s_a}(a), C_{s_a'}(r_a), m_b).
+        \]
+        \item After this, Bob holds the target value of $h$ to check the consistency of Alice's computations.
+    \end{itemize}
+\end{itemize}
+
+If both Alice and Bob behave semi-honestly, the protocol will yield the same outcome for both participants. 
+However, if either party attempts to cheat, the other party will detect it with high probability.
+\end{scheme}
+
+\begin{exercise}
+    Provide a formal proof to validate the correctness and security of this scheme.
+\end{exercise}
+
+\todo[inline]{finish the last slide}

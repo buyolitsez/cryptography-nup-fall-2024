@@ -10,6 +10,9 @@ Specifically, Bob should get only the information that $x \in  L$.
 
 \textbf{Strong Zero-Knowledge}: Bob must be convinced that Alice indeed knows a~valid proof that Bob can verify, without learning anything more.
 
+In non-strong Zero-Knowledge (CZK) protocols, Alice might possess additional knowledge about her specific input $x$ that allows her to convincingly prove that $x \in L$. 
+Here, $\prf$ is a string that can be used as a verification tool to quickly check whether $x \in L$.
+
 \begin{definition}
     A~language $L$ has a~\emph{computational zero-knowledge} proof (notation: $L \in \mathrm{CZK}$) if there exists a~protocol between a~prover $P(x)$ and a~polynomial-time bounded randomized verifier $V(x)$ such that:
     \begin{itemize}
@@ -21,8 +24,10 @@ Specifically, Bob should get only the information that $x \in  L$.
         \[
             \{ V_r'(x, \text{protocol}(P, V_r')(x)) \}_{r \in U} \quad \text{and} \quad \{ \tilde{V}_t(x) \}_{t \in U}
         \]
-        are computationally indistinguishable.
-	\todo[inline]{Am I right that $r \in U$ is the random bits?}
+        are computationally indistinguishable. 
+	Where $r \in  U, t \in  U$ are random bits.
+
+	I.e. for any "smart" verifier there is an oblivious one that produces the same distribution, i.e. knows the same amount of information about proof as $V$.
     \end{itemize}
 \end{definition}
 
@@ -44,11 +49,17 @@ Specifically, Bob should get only the information that $x \in  L$.
     Then, $P$ sends the keys corresponding to $c_u$ and $c_w$ to $V$.
     The verifier $V$ accepts if and only if $c_u \neq c_w$ and the bit commitment protocol succeeds.
 
+    Now, we need to show that some oblivious verifier can produce the same distribution as $V$.
     Let the oblivious verifier $\tilde{V}$ behave as $V'$ while simulating $P$ itself using a~random coloring $c'$.
     The probability that $\tilde{V}$ answers incorrectly is $\frac{1}{3}$, as this is the probability that two independently chosen colors from $\{ 1, 2, 3 \}$ are equal.
     Since there is also a~nonzero probability of error in the bit commitment protocol, we can assume that the total probability of error is at most $\frac{1}{2}$.
-
-    \todo[inline]{Didn't get the proof. Why we compute some $\frac{1}{6}$? What are we calculating? What has we proved? And we proved it for some specific $\tilde{V}$, right? Not any one?}
+    
+    The probability of bit commitment to fail is some $\varepsilon(n)$, we can assume it is at most $\frac{1}{2|E|}$.
+    So with this probability we choose some other edge.
+    So, the probability to fail in this case is at most:
+    \[
+    \underbrace{ \frac{1}{2 |E|} }_{ \text{commitment fail} } \cdot \underbrace{ |E| }_{ \text{other edges} } \cdot \underbrace{ \frac{1}{3} }_{ \text{same color} } =\frac{1}{6}.
+    \] Hence, the total probability of error is at most $\frac{1}{2}$.
 \end{proof}
 
 \begin{exercise}
@@ -60,7 +71,7 @@ Specifically, Bob should get only the information that $x \in  L$.
 \begin{remark}
     This is also a~strong $\mathrm{CZK}$ proof: given access to $P$ (for fixed $G$ and $c$) as an oracle, one can reconstruct some coloring in polynomial time.
     Thus, $P$ "knows" a~coloring.
-
-    \todo[inline]{isn't it a contradiction to Zero Knowledge? if Bob can reconstruct some coloring of our graph}
+    Since prover passes the check, we can ask several times questions like: tell us the colors of $(v_i, u_i)$ for random $u_i, v_i$.
+    After some steps we can recover the whole coloring.
 \end{remark}
 

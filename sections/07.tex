@@ -58,7 +58,7 @@ After some time, Alice sends a key, so everyone can decode the bid and guarantee
     There are more efficient multi-round protocols.
 \end{remark}
 
-\section{Oblivious transfer}
+\section{Oblivious transfer} \label{sec:oblivious_transfer}
 
 Alice holds two bids: $\beta_0, \beta_1, \keys$.
 She sends Bob encrypted $\beta_0, \beta_1$.
@@ -95,7 +95,7 @@ Consider \emph{semi-honest} participants.
     We say that a participant is \emph{malicious} if it does not adhere to the protocol in an effort to acquire unauthorized information.
 \end{definition}
 
-\begin{scheme}
+\begin{scheme} \
 \begin{enumerate}
     \item Alice generates $(e, s, s', d), B$
     \item Alice sends $(e, s, s'), B$
@@ -136,13 +136,13 @@ Same for $Bob$.
     And the same for Bob.
 \end{definition}
 
-Assuming that parties are semi-honest.
+Assuming that parties are semi-honest, see \Cref{df:semi_honest}.
 \begin{scheme}[Yao's scheme]
-    Represent $f$ as a Boolean circuit.
+    At first, represent $f$ as a Boolean circuit.
     \begin{itemize}
-	\item Pick symmetric keys $u_0, u_1, v_0, v_1, w_0, w_1$, encrypt the otputs, send:
+	\item Alice picks symmetric keys $u_0, u_1, v_0, v_1, w_0, w_1$, encrypt the outputs, send:
         \item Alice encrypts each gate of the circuit: input and output bits are encoded.
-	Each line of the truth table of each gate is representated by three bits $u, v, w$, means that if on the left wire $u$ comes, one right wire $v$, then the result is $w$.
+	Each line of the truth table of each gate is represented by three bits $u, v, w$, means that if on the left wire $u$ comes, one right wire $v$, then the result is $w$.
 	Alice encodes $E_i(E_v(w))$ for each of four lines and then send shuffled result for each gate!
     
 	Example:
@@ -164,7 +164,7 @@ u_1 & v_1 & E_{u_1}\big(E_{v_1}(w_0)\big) \\
 \todo[inline]{picture}
 	\item Send specific codewords for the inputs $a_1, \ldots, a_m$.
 	\item Bob has encrypted circuit and the codewords for Alice's inputs.
-	\item Bob gets codewords for his inputs from Alice using OT.
+	\item Bob gets codewords for his inputs from Alice using Oblivious Transfer, so Alice cannot recover Bob's input. See \Cref{sec:oblivious_transfer} for more details on OT.
 	\item Bob simulate the circuit (in private) and get the encrypted output.
 	\item Alice decrypts the output (e.g. bit commitment or (1,2)-OT again)
     \end{itemize}
