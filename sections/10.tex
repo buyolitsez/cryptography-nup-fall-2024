@@ -1,0 +1,150 @@
+%19.12.2024
+
+\section{Blockchain}
+
+A sequential database is maintained by a set of participants who collaboratively update and manage the stored information. 
+This database may not necessarily be associated with cryptocurrency but can represent any dataset that requires universal synchronization across all participants. 
+The system operates without predefined participants, allowing individuals to join or leave at will. 
+Among these participants, some may act maliciously, while others contribute to updating the database. 
+Although the database grows over time, it is imperative that the information remains consistent across all nodes (participants).
+
+Let us consider the architectural layers of a blockchain system:
+
+\begin{itemize}
+    \item[0.] Reliable communication between the participants, facilitated by mechanisms such as the Internet or peer-to-peer networks.
+    \item[1.] \textbf{Consensus Layer}: This ensures that all participants have access to the most up-to-date information. Maintaining consensus in large-scale networks poses significant challenges.
+	\begin{itemize}
+	    \item Ensuring synchronization across nodes while updating the database.
+	    \item Managing the presence of new, unauthenticated, and potentially dishonest participants.
+	    \item Efficiently performing computations.
+	\end{itemize}
+    \item[2.] \textbf{Scaling Layer}: This addresses the challenges posed by handling vast numbers of participants and transactions.
+    \item[3.] \textbf{Application Layer}: Developers implement specific schemes and functionalities on this layer.
+\end{itemize}
+
+Let us delve deeper into the \emph{consensus layer}. 
+Key aspects of this layer include:
+
+\begin{itemize}
+    \item Communication is secured through digital signatures.
+    \item Each node maintains an ordered copy of the blockchain database (history or ledger), ensuring \emph{prefix consistency}. 
+    Specifically, if a sequence $u$ and its extension $u \circ x$ are present in the database, and another sequence $u \circ y$ is also present, then it must hold that $x = y$. 
+    Additionally, every new block is eventually propagated to all nodes.
+    \item Nodes are capable of performing local computations, receiving messages from other nodes and clients, and transmitting messages to other nodes (e.g., sharing the results of local computations).
+    \item Every record in the database must be justified by a valid reason.
+    \item There are additional validity checks, such as verifying the identity of the sender, ensuring the sender's permissions, and other security constraints.
+\end{itemize}
+
+\subsection{Byzantine Agreement: The Dolev-Strong Protocol}
+
+Consider a fixed set of participants, among whom at most $f$ are classified as "Byzantine." 
+These Byzantine participants are malicious actors capable of sending incorrect messages, eavesdropping on communications, and engaging in covert collaboration. 
+Each participant is assumed to possess a key pair $(\pk_i, \sk_i)$ for digital signing, where the public keys $\pk_i$ are known to all participants. 
+While this assumption is reasonable at present, the system could potentially operate without this requirement. 
+
+The system operates under a synchronous model, meaning that time is managed through broadcasts by an authoritative source, and each step of communication or computation is completed within a fixed time interval. 
+In practice, however, real networks must account for unexpected delays, and the broadcasting mechanism is typically implemented as a peer-to-peer network.
+
+
+\begin{problem}[Byzantine Broadcast]
+    There is a designated Sender, who may be honest or malicious. 
+    The objective is for all honest participants to agree on the same message. 
+    Furthermore, if the Sender is honest, the agreed-upon message must be exactly the message provided by the Sender.
+\end{problem}
+
+\begin{problem}[Byzantine Agreement] \label{problem:byzantine_agreement}
+    There is no designated Sender; every participant starts with an initial value, which may differ among participants. 
+    The objective is for all honest participants to agree on a single common value. 
+    Furthermore, if all honest participants start with the same initial value, the agreed-upon value must be that initial value.
+\end{problem}
+
+
+\begin{scheme}[Dolev-Strong Protocol for Byzantine Broadcast]
+    The protocol operates over $f + 1$ rounds, where $f$ is the maximum number of Byzantine participants.
+    The goal is to ensure that all honest participants agree on a common message.
+    All communication messages will follow this format:
+    \[
+    (\bit, nr^{(1)}, \sign^{(1)}, nr^{(2)}, \sign^{(2)}, \ldots),
+    \]
+    where $\sign^{(i)}$ represents a digital signature of the form 
+    \[
+    \sign^{(i)} = S_{nr^{(i)}}(\bit, nr^{(1)}, \sign^{(1)}, \ldots, nr^{(i - 1)}, \sign^{(i-1)}),
+    \]
+    created by participant $nr^{(i)}$. 
+
+\begin{suggestion}
+    We say that a node $i$ is convinced of value $v$ at time $t$, if it receives a message such that:
+    \begin{itemize}
+        \item The reference value (\bit) of the message is $v$.
+	\item It is signed by the sender
+	\item It is signed by the $\ge t - 1$ other distinct nodes, none of which are $i$.
+    \end{itemize}
+\end{suggestion}
+
+
+    The protocol proceeds as follows:
+    \begin{enumerate}
+        \item \textbf{Round 1: Sender's message.} 
+    The designated Sender broadcasts its signed message (we assume that number of the sender is 1):
+        \[
+	(\msg, 1, S_1(\msg)).
+        \]
+        \item \textbf{Rounds 2 to $f + 1$: Message propagation.} 
+        In each round $j$ ($2 \leq j \leq f + 1$), each participant processes messages as follows.
+	If a node $i$ is convinced of value $v$ at this time step, add $i$'s signature and echo to all other nodes.
+        \item \textbf{Round $f + 1$: Decision.} 
+	Each node $i$ makes a decision. If $i$ is convinced of exactly one value $v$, it outputs $v$.
+	Otherwise, it outputs $\perp$, indicating failure.
+    \end{enumerate}
+\end{scheme}
+
+\begin{proof}
+    The protocol guarantees the following two properties:
+    \begin{enumerate}
+        \item \textbf{Validity:} If the Sender is honest, the agreed-upon bit is the one provided by the Sender.
+        \item \textbf{Agreement:} All honest participants agree on the same bit by the end of the protocol.
+    \end{enumerate}
+
+    If the Sender is honest, it broadcasts the message $(\msg, 1, S_1(\msg))$ in Round 1. 
+    Since no participant can forge the Sender's signature, all honest participants become convinced of $\msg$.
+    Also, nobody can convince them on other message, since the sender is honest.
+    So, the protocol is valid.
+
+    In terms of agreement, the protocol ensures that:
+    \begin{itemize}
+        \item If an honest participant get convinced in a round $i \le f$, all other honest participants will receive and propagate this message in subsequent rounds, as they sign and broadcast it.
+        \item If an honest participant get convinced in the final round, it must already have been signed by some other honest participant. 
+    \end{itemize}
+    Since all messages are digitally signed and cannot be forged, malicious participants cannot introduce conflicting valid messages. 
+    This guarantees that all honest participants agree on the same message, even if the Sender is dishonest.
+
+    \textbf{Number of Rounds:} The protocol requires $f + 1$ rounds to ensure that the signatures from all honest participants propagate through the network, overcoming the influence of up to $f$ Byzantine participants. 
+    As the number of honest participants increases, fewer rounds are needed to achieve consensus, since fewer signatures are required to guarantee agreement.
+\end{proof}
+
+\begin{exercise}
+    Check that the more honest parties, the fewer rounds required.
+\end{exercise}
+
+From~the protocol that implements Byzantine broadcast, one~can convert it~to~a Byzantine agreement protocol.
+
+\begin{scheme}[Protocol for Byzantine Agreement]
+    Let $N$~be~the number of participants.
+    The protocol consists of $N$~rounds.
+    In~round number $i$, participant number $i$~takes the lead.
+    The $i$'th participant becomes the Sender and broadcasts all transactions of~which they are aware.
+    Other participants add the received transactions~to~their local message set.
+\end{scheme}
+
+\begin{proof}
+    Dishonest senders cannot compromise data integrity (consistency). 
+    Furthermore, they cannot interfere with the data exchanged among~the honest participants.
+\end{proof}
+
+\subsection{Tendermint Protocol}
+Now, we will move to a more realistic scenario.
+We assume that communication is partially asynchronous.
+So, timing becomes important, since some messages arrive later.
+Still, the number of dishonest players is bounded by $f$.
+We denote the delta which we assume to be a maximum communication time as $\Delta$.
+
