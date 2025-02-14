@@ -81,22 +81,19 @@ There exist various adversarial models:
     This scheme is secure.
 \end{lemma}
 \begin{proof}
-	Assume there exists an adversary~$A^{\bullet}$ for the given DSS.
-	We will demonstrate how to invert~$f$.
-	Let~$y$ be a~value for which we aim to find~$f^{-1}(y)$.
-	Randomly choose~$k \in [m]$~and~$b \in \{0, 1\}$. Then, generate:
-	\[
-		G(1^{n}, r_g) = \big((s^{0}_{0}, s^{1}_{0}, \ldots, \hcancel[red]{s_{k}}^{b}, \ldots, s^{0}_{m}, s^{1}_{m}), (v^{0}_{0}, v^{1}_{0}, \ldots, y, \ldots, v^{0}_{m}, v^{1}_{m})\big).
-	\] 
-	Here, we replace~$v_{k}^{b}$ with~$y$~and remove~$s_{k}^{b}$ from the signing key.
+	Assume there exists an adversary~$A^{\bullet}$ for the given DSS. It means, that $A^{\bullet}$ have public key ($v_i^k$), can ask for a signature on one message $M$ it chooses, gets the signature and after this forge signature on a new message $M'$ with non-negligible probability. \\
+	We will demonstrate how to invert~$f$ with non-negligible probability.
+  	Let~$y$ be a~value for which we aim to find~$f^{-1}(y)$.
+  	Randomly choose~$k \in [m]$~and~$b \in \{0, 1\}$. Then, generate:
+  	\[
+    		G(1^{n}, r_g) = \big((s^{0}_{0}, s^{1}_{0}, \ldots, s^{0}_{m}, s^{1}_{m}), (v^{0}_{0}, v^{1}_{0}, \ldots, y, \ldots, v^{0}_{m}, v^{1}_{m})\big).
+  	\] 
+  	Here, we replace~$v_{k}^{b}$ with~$y$~.
 
-	Next, we query the adversary to sign a~random message~$m$.
-	The adversary may use the signing oracle as a~black box to sign some other message~$x$.
-	If~$x_k \neq b$, the adversary can proceed as usual, and we are able to invert~$f$.
-	This scenario occurs with probability~$\frac{1}{2}$, as~$b$ is chosen randomly.
-	However, in this case, we cannot invert~$f$ always, as it depends on the information provided by the signing oracle.
-	I.e. we can invert $f$ only if  $z_{k} \neq  x_k$, it occurs with probability at least~$\frac{1}{m}$.
-	Therefore, by leveraging the adversary's capabilities, we can invert~$f$ with non-negligible probability.
+	Next, we query the adversary to sign a~random message~$M' \leftarrow U_m$ .
+  	If $M_k = b$ then just abort, because in this case (only) we cannot generate correct signature (we replace $v_k^b$ in public key and $sign_k = s_k^{M_k}$).
+    	Assume that $A^{\bullet}$ has not aborted, so $M_k\neq b$. This happens with probability $1/2$ (because $M \leftarrow U_m$). $A^{\bullet}$ forge signature for $M$ with probability $\epsilon$. We need to invert exactly $y = v_k^b$, so $M'_k = b$. Now we know that $M\neq M'$, so if $i: M_i\neq M'_i$ equal to $k$, then $M'_k = 1-M_k = b$. So, it happens with probability at least $1/|M| =1/m$ that $i=k$.
+    	Finally, our algorithm invert $f$ with probability at least $\frac{\epsilon}{2l}$, where $\epsilon$ is non-negligible. Contradiction.    
 \end{proof}
 
 \subsection{Unbounded DSS and Collision-Resistant Hash-Function Families}
