@@ -80,20 +80,44 @@ There exist various adversarial models:
 \begin{lemma}
     This scheme is secure.
 \end{lemma}
+ 
 \begin{proof}
-	Assume there exists an adversary~$A^{\bullet}$ for the given DSS. It means, that $A^{\bullet}$ have public key ($v_i^k$), can ask for a signature on one message $M$ it chooses, gets the signature and after this forge signature on a new message $M'$ with non-negligible probability. \\
-	We will demonstrate how to invert~$f$ with non-negligible probability.
-  	Let~$y$ be a~value for which we aim to find~$f^{-1}(y)$.
-  	Randomly choose~$k \in [m]$~and~$b \in \{0, 1\}$. Then, generate:
-  	\[
-    		G(1^{n}, r_g) = \big((s^{0}_{0}, s^{1}_{0}, \ldots, s^{0}_{m}, s^{1}_{m}), (v^{0}_{0}, v^{1}_{0}, \ldots, y, \ldots, v^{0}_{m}, v^{1}_{m})\big).
-  	\] 
-  	Here, we replace~$v_{k}^{b}$ with~$y$~.
+  Suppose there exists an adversary \(A^\bullet\) that breaks the given digital signature scheme (DSS) with a non-negligible advantage \(\epsilon\). We will show how to use \(A^\bullet\) to invert the one-way function \(f\) with non-negligible probability, contradicting the one-wayness of \(f\).
 
-	Next, we query the adversary to sign a~random message~$M' \leftarrow U_m$ .
-  	If $M_k = b$ then just abort, because in this case (only) we cannot generate correct signature (we replace $v_k^b$ in public key and $sign_k = s_k^{M_k}$).
-    	Assume that $A^{\bullet}$ has not aborted, so $M_k\neq b$. This happens with probability $1/2$ (because $M \leftarrow U_m$). $A^{\bullet}$ forge signature for $M$ with probability $\epsilon$. We need to invert exactly $y = v_k^b$, so $M'_k = b$. Now we know that $M\neq M'$, so if $i: M_i\neq M'_i$ equal to $k$, then $M'_k = 1-M_k = b$. So, it happens with probability at least $1/|M| =1/m$ that $i=k$.
-    	Finally, our algorithm invert $f$ with probability at least $\frac{\epsilon}{2l}$, where $\epsilon$ is non-negligible. Contradiction.    
+  Let \(y\) be an arbitrary value for which we wish to find \(f^{-1}(y)\). We randomly choose an index \(k \in [m]\) and a bit \(b \in \{0,1\}\). Then we generate 
+  \[
+    G\bigl(1^{n}, r_g\bigr) 
+    \;=\; 
+    \bigl( (s^{0}_{0}, s^{1}_{0}, \dots, s^{0}_{m}, s^{1}_{m}),\;
+           (v^{0}_{0}, v^{1}_{0}, \dots, v^{0}_{m}, v^{1}_{m}) \bigr),
+  \]
+  but \emph{replace} \(v_{k}^{b}\) with our target value \(y\). In other words, we “hide” \(y\) in one position of the public key.
+
+  We give the adversary \(A^\bullet\) the modified public key \(\{v_{i}^{j}\}\) (where one element \(v_{k}^{b}\) has been replaced by \(y\)) and the corresponding secret key \(\{s_{i}^{j}\}\). The adversary then makes (adaptive) signing queries. Denote by \(M'\) the message (in \(\{0,1\}^m\)) that \(A^\bullet\) asks us to sign at some point.
+
+  Let \(M'_k\) be the \(k\)-th bit of \(M'\).
+  - If \(M'_k = b\), we must \textbf{abort}, since we cannot produce a valid signature (the required preimage for \(v_{k}^{b}\) is unknown; it was replaced by \(y\)).
+  
+  - If \(M'_k \neq b\), we \emph{can} generate a valid signature, because we do know all necessary preimages (including \(s_{k}^{1-b}\)).
+
+  The key observation is that \(A^\bullet\) does not know which index \(k\) we selected or which bit \(b\) we used to “hide” \(y\). Hence the probability that \(A^\bullet\) picks a message \(M'\) with \(M'_k = b\) is \(1/2\), and similarly \(M'_k \neq b\) with probability \(1/2\). Thus, we do not abort with probability \(1/2\).
+
+  Next, assume that the adversary eventually \emph{forges} a signature (which happens with probability at least \(\epsilon\)). A successful forgery must include a correct preimage for one of the public-key elements \(v_{i}^{j}\). If it happens that the forged preimage corresponds to \(v_{k}^{b} = y\), we recover \(f^{-1}(y)\) and succeed in inverting \(f\).
+
+  To estimate the overall probability of success, note the following:
+
+  - We do \emph{not} abort with probability \(1/2\).
+
+  - The adversary forges successfully with probability at least \(\epsilon\).
+
+  - Among the \(2m\) components \(\{v_{i}^j\}\), there is exactly one “special” element \(v_{k}^{b} = y\). The probability that the adversary’s forgery reveals the preimage of \(y\) (i.e., targets precisely \((k,b)\)) is at least \(1/m\).
+
+  Multiplying these factors together, our overall probability of recovering \(f^{-1}(y)\) is at least
+  \[
+    \frac{1}{2} \;\times\; \epsilon \;\times\; \frac{1}{m} 
+    \;=\; \frac{\epsilon}{2m}.
+  \]
+  Since \(\epsilon\) is non-negligible, this implies that \(f\) would no longer be one-way, a contradiction. Hence our initial assumption about the existence of such an adversary \(A^\bullet\) must be false.
 \end{proof}
 
 \subsection{Unbounded DSS and Collision-Resistant Hash-Function Families}
