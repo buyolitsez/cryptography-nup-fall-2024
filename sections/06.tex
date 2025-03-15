@@ -93,7 +93,8 @@ There exist various adversarial models:
   \]
   but \emph{replace} \(v_{k}^{b}\) with our target value \(y\). In other words, we “hide” \(y\) in one position of the public key.
 
-  We give the adversary \(A^\bullet\) the modified public key \(\{v_{i}^{j}\}\) (where one element \(v_{k}^{b}\) has been replaced by \(y\)) and the corresponding secret key \(\{s_{i}^{j}\}\). The adversary then makes (adaptive) signing queries. Denote by \(M'\) the message (in \(\{0,1\}^m\)) that \(A^\bullet\) asks us to sign at some point.
+  We give the adversary \(A^\bullet\) the modified public key \(\{v_{i}^{j}\}\) (where one element \(v_{k}^{b}\) has been replaced by \(y\)). %and the corresponding secret key \(\{s_{i}^{j}\}\). 
+The adversary then makes (adaptive) signing queries. Denote by \(M'\) the message (in \(\{0,1\}^m\)) that \(A^\bullet\) asks us to sign at some point.
 
   Let \(M'_k\) be the \(k\)-th bit of \(M'\).
   - If \(M'_k = b\), we must \textbf{abort}, since we cannot produce a valid signature (the required preimage for \(v_{k}^{b}\) is unknown; it was replaced by \(y\)).
@@ -206,11 +207,23 @@ Now, we will attempt to include~$\xi$ only in~the signature.
     Prove~it.
 \end{exercise}
 
-\subsection{Unbounded Many-Times DSS}
-\todo[inline]{finish}
+\subsection{Unbounded Many-Times DSS}\label{sec:DSSmultiple}
+%\todo[inline]{finish}
 
-\section{Many-Time DSS - Idea}
+%\section{Many-Time DSS - Idea}
+\subsubsection{Idea}
 
+Vlad Tukhta who wrote Sect.~\ref{sec:DSSmultiple} decided to quote
+the lecture notes from a course\footnote{University of Illinois, Urbana Champaign,
+CS/ECE 498AC3/4 Applied Cryptography,
+Instructor: Dakshita Khurana,
+Scribe: Jingyu Qian,
+Date: October 1, 2020,
+\url{https://courses.grainger.illinois.edu/cs498ac3/fa2020/Files/Lecture_12_Scribe.pdf}}
+at 
+University of Illinois, Urbana Champaign.
+
+\begin{center}\fcolorbox{yellow!10!white}{yellow!10!white}{\begin{minipage}{\textwidth-1cm}
 Here we define the many-time secure signature property, which is stronger than the one-time secure signature property. Similarly, we can define the many-time signature game as follows.
 
 \textbf{Definition} For a signature scheme $\Pi = (Gen, Sign, Verify)$, the many-time signature game $\text{Sig-game}^{q-time}_{A,C,\Pi} (k)$ is defined using a challenger $C$ and an adversary $A$. In this game:
@@ -235,8 +248,50 @@ Pr[\text{Sig-game}^{q-time}_{A,C,\Pi} = 1] \leq \epsilon(k).
 Additionally, we have the strong many-time secure signature property, where we only require the adversary to output the message-signature pair $(m, \sigma)$ such that $(m, \sigma) \notin \{(m_1, \sigma_1), \dots, (m_q, \sigma_q)\}$. 
 
 Since we have defined the many-time secure signature property, we can also easily see that the Lamport one-time signature scheme is not many-time secure. In fact, it is not even two-time secure. The adversary can send $m_1 = 00\dots0$ and $m_2 = 11\dots1$ to the challenger. Then the adversary simply extracts the secret signing key $sk$ from the challenger's response, where $\sigma_1 = (r_{1,0}, r_{2,0}, \dots, r_{n,0})$ and $\sigma_2 = (r_{1,1}, r_{2,1}, \dots, r_{n,1})$.
+\end{minipage}}\end{center}
 
-\section{Many-Time DSS: Construction}
+\subsubsection{A Memory-Dependent Signature Scheme}
+
+Vlad Tukhta who wrote Sect.~\ref{sec:DSSmultiple} decided to add
+material that was not present in the lectures and to quote
+the publicly available draft\footnote{Oded Goldreich.
+The Foundations of Cryptography --- drafts of a two-volume book,
+\url{https://www.wisdom.weizmann.ac.il/~oded/foc-drafts.html}}
+of Goldreich's book.
+
+\begin{center}\fcolorbox{yellow!10!white}{yellow!10!white}{\begin{minipage}{\textwidth-1cm}
+Authentication-Trees can be considered as one of the ways to build a Many-Time DSS.
+
+Let $(G, S, V)$ be a one-time signature scheme. Consider the following memory-dependent signature scheme, $(G', S', V')$, with $G' = G$. On security parameter $n$, the scheme uses a full binary tree of depth $n$. Each of the nodes in this tree is labeled by a binary string so that the root is labeled by the empty string, denoted $\lambda$, and the left (resp., right) child of a node labeled $x$ is labeled by $x0$ (resp., $x1$). Here we refer to the current state of the signing process as a record.
+
+\paragraph{Initiating the Scheme.}
+To initiate the scheme, on security parameter $n$, we invoke $G(1^n)$ and let $(s, v) \leftarrow G(1^n)$. We record $(s, v)$ as the key-pair associated with the root and output $v$ as the (public) verification key.
+
+\paragraph{Signing Algorithm $S'$.}
+To sign a new document, denoted $\alpha$, we first allocate an unused leaf. Let $\sigma_1 \dots \sigma_n$ be the label of this leaf. For example, we may keep a counter of the number of documents signed and determine $\sigma_1 \dots \sigma_n$ according to the counter value (e.g., if the counter value is $c$, then we use the $c$-th string in lexicographic order).
+
+Next, for every $i = 1, ..., n$ and every $\tau \in \{0,1\}$, we try to retrieve from our record the key-pair associated with the node labeled $\sigma_1 \dots \sigma_{i-1}\tau$. If such a pair is not found, we generate it by invoking $G(1^n)$ and store it for future use:
+\[
+(s_{\sigma_1 \dots \sigma_{i-1}\tau}, v_{\sigma_1 \dots \sigma_{i-1}\tau}) \leftarrow G(1^n).
+\]
+
+Next, for every $i = 1, ..., n$, we try to retrieve from our record a signature to the string $v_{\sigma_1 \dots \sigma_{i-1}0} v_{\sigma_1 \dots \sigma_{i-1}1}$ relative to the signing-key $s_{\sigma_1 \dots \sigma_{i-1}}$. If such a signature is not found, we generate it by invoking $S$ and store it for future use:
+\[
+S_{s_{\sigma_1 \dots \sigma_{i-1}}}(v_{\sigma_1 \dots \sigma_{i-1}0}, v_{\sigma_1 \dots \sigma_{i-1}1}).
+\]
+
+We define:
+\[
+\text{auth}_{\sigma_1 \dots \sigma_{i-1}} = (v_{\sigma_1 \dots \sigma_{i-1}0}, v_{\sigma_1 \dots \sigma_{i-1}1}, S_{s_{\sigma_1 \dots \sigma_{i-1}}}(v_{\sigma_1 \dots \sigma_{i-1}0}, v_{\sigma_1 \dots \sigma_{i-1}1})).
+\]
+
+Finally, the signature of $\alpha$ consists of:
+\[
+(\sigma_1 \dots \sigma_n, \text{auth}_\lambda, \text{auth}_{\sigma_1}, ..., \text{auth}_{\sigma_1 \dots \sigma_{n-1}}, S_{s_{\sigma_1 \dots \sigma_n}}(\alpha)).
+\]
+\end{minipage}}\end{center}
+
+\subsubsection{Many-Time DSS: Construction}
 
 From one-time DSS and pseudorandom function family.
 
@@ -250,7 +305,7 @@ From one-time DSS and pseudorandom function family.
     \item \textbf{Verification key} $pk: v$
 \end{itemize}
 
-\subsection{Signing Algorithm}
+\paragraph{Signing Algorithm.}
 
 \begin{itemize}
     \item Select path $\sigma = \sigma_1 \dots \sigma_n \in \{0,1\}^n$ from the root key to a leaf either at random or using $\zeta(110\xi(\text{msg}))$.
@@ -285,9 +340,9 @@ A digital signature scheme is correct if a signature generated by a valid signin
 
 This means that a correctly generated signature should always pass verification.
 
-\section{Proof of Correctness}
+\subsubsection{Proof of Correctness}
 
-\subsection{Step 1: Key Generation and Signature Path}
+\paragraph{Step 1: Key Generation and Signature Path.}
 Many-Time DSS constructs keys recursively along a path from a root key to a leaf in a binary tree. The keys are generated as follows:
 \begin{equation}
     (s_{\sigma'0}, v_{\sigma'0}) \gets G(1^n, \zeta(10^{n-i+1} \sigma'0))
@@ -297,7 +352,7 @@ Many-Time DSS constructs keys recursively along a path from a root key to a leaf
 \end{equation}
 for all prefixes \( \sigma' \) of the chosen path \( \sigma \).
 
-\subsection{Step 2: Recursive Signature Verification}
+\paragraph{Step 2: Recursive Signature Verification.}
 Each node key in the path is verified sequentially using a one-time signature:
 \begin{equation}
     S_{s_{\sigma_1}} (v_0), S_{s_{\sigma_1 \sigma_2}} (v_{\sigma_1}), \dots, S_{s_{\sigma_1 \dots \sigma_{n-1}}} (v_{\sigma_1 \dots \sigma_{n-2}})
@@ -305,7 +360,7 @@ Each node key in the path is verified sequentially using a one-time signature:
 
 This ensures that each signature in the sequence is valid and authenticates the next verification key.
 
-\subsection{Step 3: Final Signature Verification}
+\paragraph{Step 3: Final Signature Verification.}
 The final signature \( S_{\sigma}(msg, \zeta(00\dots\sigma)) \) is checked using the same deterministic randomness function \( \zeta \). Since the same deterministic key generation process is used at each step, verification proceeds as follows:
 
 \begin{itemize}
@@ -313,43 +368,13 @@ The final signature \( S_{\sigma}(msg, \zeta(00\dots\sigma)) \) is checked using
     \item If all intermediate signatures are valid, the final message signature is verified.
 \end{itemize}
 
-\subsection{Step 4: Conclusion}
+\paragraph{Step 4: Conclusion.}
 Since each step in the verification process is based on deterministic key derivation and sequential signature verification, correctness follows:
 \begin{equation}
     \text{Verify}(pk, m, \text{Sign}(sk, m)) = 1
 \end{equation}
 Thus, a correctly generated signature will always be accepted, proving the correctness of Many-Time DSS.
 
-
-\section{A Memory-Dependent Signature Scheme}
-
-Authentication-Trees can be considered as one of the ways to build a Many-Time DSS.
-
-Let $(G, S, V)$ be a one-time signature scheme. Consider the following memory-dependent signature scheme, $(G', S', V')$, with $G' = G$. On security parameter $n$, the scheme uses a full binary tree of depth $n$. Each of the nodes in this tree is labeled by a binary string so that the root is labeled by the empty string, denoted $\lambda$, and the left (resp., right) child of a node labeled $x$ is labeled by $x0$ (resp., $x1$). Here we refer to the current state of the signing process as a record.
-
-\subsection{Initiating the Scheme}
-To initiate the scheme, on security parameter $n$, we invoke $G(1^n)$ and let $(s, v) \leftarrow G(1^n)$. We record $(s, v)$ as the key-pair associated with the root and output $v$ as the (public) verification key.
-
-\subsection{Signing Algorithm $S'$}
-To sign a new document, denoted $\alpha$, we first allocate an unused leaf. Let $\sigma_1 \dots \sigma_n$ be the label of this leaf. For example, we may keep a counter of the number of documents signed and determine $\sigma_1 \dots \sigma_n$ according to the counter value (e.g., if the counter value is $c$, then we use the $c$-th string in lexicographic order).
-
-Next, for every $i = 1, ..., n$ and every $\tau \in \{0,1\}$, we try to retrieve from our record the key-pair associated with the node labeled $\sigma_1 \dots \sigma_{i-1}\tau$. If such a pair is not found, we generate it by invoking $G(1^n)$ and store it for future use:
-\[
-(s_{\sigma_1 \dots \sigma_{i-1}\tau}, v_{\sigma_1 \dots \sigma_{i-1}\tau}) \leftarrow G(1^n).
-\]
-
-Next, for every $i = 1, ..., n$, we try to retrieve from our record a signature to the string $v_{\sigma_1 \dots \sigma_{i-1}0} v_{\sigma_1 \dots \sigma_{i-1}1}$ relative to the signing-key $s_{\sigma_1 \dots \sigma_{i-1}}$. If such a signature is not found, we generate it by invoking $S$ and store it for future use:
-\[
-S_{s_{\sigma_1 \dots \sigma_{i-1}}}(v_{\sigma_1 \dots \sigma_{i-1}0}, v_{\sigma_1 \dots \sigma_{i-1}1}).
-\]
-
-We define:
-\[
-\text{auth}_{\sigma_1 \dots \sigma_{i-1}} = (v_{\sigma_1 \dots \sigma_{i-1}0}, v_{\sigma_1 \dots \sigma_{i-1}1}, S_{s_{\sigma_1 \dots \sigma_{i-1}}}(v_{\sigma_1 \dots \sigma_{i-1}0}, v_{\sigma_1 \dots \sigma_{i-1}1})).
-\]
-
-Finally, the signature of $\alpha$ consists of:
-\[
-(\sigma_1 \dots \sigma_n, \text{auth}_\lambda, \text{auth}_{\sigma_1}, ..., \text{auth}_{\sigma_1 \dots \sigma_{n-1}}, S_{s_{\sigma_1 \dots \sigma_n}}(\alpha)).
-\]
+\subsubsection{Proof of security}
+\todo[inline]{Proof of security}
 

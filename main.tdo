@@ -1,10 +1,10 @@
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ fix}{16}{section*.2}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{17}{section*.3}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{21}{section*.4}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ picture}{23}{section*.5}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish}{23}{section*.6}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ Clarify the above list for greater precision and readability.}{24}{section*.7}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ Clarify what it means for unopened envelopes to "contain something" and how this is formally ensured.}{26}{section*.14}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ is it true?}{27}{section*.15}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ fix the protocol}{27}{section*.16}%
-\contentsline {todo}{\color@fb@x {}{black}{}{red!20}{\leavevmode {\color {red!20}o}}\ finish the last slide}{27}{section*.18}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ fix}{16}{section*.2}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ finish}{17}{section*.3}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ Proof of security}{23}{section*.11}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ picture}{25}{section*.12}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ finish}{25}{section*.13}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ Clarify the above list for greater precision and readability.}{27}{section*.14}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ Clarify what it means for unopened envelopes to "contain something" and how this is formally ensured.}{29}{section*.15}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ is it true?}{29}{section*.16}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ fix the protocol}{30}{section*.17}%
+\contentsline {todo}{\fcolorbox {black}{red!20}{\textcolor {red!20}{o}}\ finish the last slide}{30}{section*.18}%
